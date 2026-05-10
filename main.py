@@ -108,11 +108,11 @@ if st.session_state.state["name"] and st.session_state.state["age"] and st.sessi
                     "role": "tool",
                     "name": m.name,
                     "content": m.content,
-                    "query": m.query
+                    "query": m.additional_kwargs.get("query", "") if m.additional_kwargs else ""
                 })
 
                 with st.expander(f"🔬PubMed result", expanded=False):
-                    st.text(f"Query: {m.query}")
+                    st.text(f"Query: {m.additional_kwargs.get('query', '')}")
                     st.markdown(m.content)
 
         report_text = st.session_state.state.get("report")

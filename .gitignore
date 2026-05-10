@@ -5,6 +5,10 @@ build/
 dist/
 wheels/
 *.egg-info
+.idea/
+
+# Claude
+.claude/
 
 # Virtual environments
-.venv
+env/
