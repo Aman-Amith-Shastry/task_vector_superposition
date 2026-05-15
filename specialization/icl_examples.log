@@ -1,0 +1,486 @@
+
+======================================================================
+EXPERIMENT : analyze_specializations — collect_task_vectors — layer 13
+TIME       : 2026-05-15 12:34:23
+======================================================================
+
+--- Medicine | sample 0 | layer 13 ---
+  [ICL 1] 'Ebstein anomaly of the tricuspid valve consists of-' → C
+  [ICL 2] 'Most common cause of upper GI bleed is ?' → C
+  [ICL 3] 'Kveim test is used for -' → C
+  [TEST] 'In case of Fracture of mandible; alveolar border experiences which force'
+
+--- Medicine | sample 1 | layer 13 ---
+  [ICL 1] 'CAGE scale is used in:' → A
+  [ICL 2] 'Aery involved in 3rd cranial nerve lesion?' → C
+  [ICL 3] 'All of the following are the electrocardiographic features of severe hyperkalemi' → B
+  [TEST] 'Transfusion-associated malaria has a shoer incubation period because of the pres'
+
+--- Medicine | sample 2 | layer 13 ---
+  [ICL 1] 'Which of the following is a contraindication to the use of Beta Blockers:' → C
+  [ICL 2] 'Calcitonin is secreted from -' → C
+  [ICL 3] 'All of the following are X-linked disorders except -' → D
+  [TEST] 'Cherry red spot and Hollenhorst plaque are seen in:'
+
+--- Medicine | sample 3 | layer 13 ---
+  [ICL 1] 'A patient has the following findings-splenomegaly, low RBC count, normal WBC, an' → D
+  [ICL 2] 'Bence jones proteinuria is best detected by' → D
+  [ICL 3] 'A 56-year-old woman presents with feeling light-headed when standing up and 3 da' → D
+  [TEST] 'Which of the following techniques is based on RNA?'
+
+--- Medicine | sample 4 | layer 13 ---
+  [ICL 1] 'A 56-year-old woman presents with feeling light-headed when standing up and 3 da' → D
+  [ICL 2] 'Pigment gallstones usually not seen in:' → D
+  [ICL 3] 'LBBB is seen with all except' → C
+  [TEST] 'A study finds no significant association between two variables but truly there e'
+
+--- Medicine | sample 5 | layer 13 ---
+  [ICL 1] 'Signs of chronic liver failure are all except -' → A
+  [ICL 2] 'Which of the following is not a feature of pseudotumor cerebri?' → D
+  [ICL 3] 'Elevated JVP is seen in' → A
+  [TEST] 'Tooth in the mandibular arch which is most likely to be'
+
+--- Medicine | sample 6 | layer 13 ---
+  [ICL 1] 'All are used for AIDS except-' → A
+  [ICL 2] 'Which of the following is not used in diagnosis of insulinoma -' → D
+  [ICL 3] 'Milk maid grip is seen in' → A
+  [TEST] 'Zone of stimulation contains all except:'
+
+--- Medicine | sample 7 | layer 13 ---
+  [ICL 1] "Cardiac anomaly seen in Noonan's syndrome is" → C
+  [ICL 2] 'Hypophosphatemia is seen in -a) Pseudohypoparathyropdismb) CRFc) Ricketsd) Hyper' → B
+  [ICL 3] 'Which of the following is false about WPW syndrome' → C
+  [TEST] 'Dr Bernhard Giesenhagen gave which of the following'
+
+--- Medicine | sample 8 | layer 13 ---
+  [ICL 1] 'Which of these does not cause crescentric glomerulonephritis -' → B
+  [ICL 2] 'Membranous glomerulonephritis is associated with-a) Renal venous thrombosisb) Ho' → A
+  [ICL 3] 'Cause of secondary hypeension includes -' → B
+  [TEST] 'Pulpectomy and pulp capping are more successful in'
+
+--- Medicine | sample 9 | layer 13 ---
+  [ICL 1] 'Clinical features of pneumonia are -' → B
+  [ICL 2] 'HIV associated nephropathy is a type of:' → C
+  [ICL 3] 'Safest anti TB drug in renal diseas -' → C
+  [TEST] 'Muscles of mastication are supplied by:'
+
+--- Medicine | sample 10 | layer 13 ---
+  [ICL 1] 'The drug of choice for absence seizure' → A
+  [ICL 2] 'Which of the following is not used in diagnosis of insulinoma -' → D
+  [ICL 3] 'A patient present with acute anterior wall infarction and hyotension. Which will' → D
+  [TEST] 'Which of the following conditions is associated with polyhy dramnios?'
+
+--- Medicine | sample 11 | layer 13 ---
+  [ICL 1] 'Reactive ahritis is usually caused by' → A
+  [ICL 2] 'A 45-year-old man presents with a history of frequent falls. He has difficulty i' → D
+  [ICL 3] 'Tumor induced hypoglycemia is seen in all , EXCEPT:' → D
+  [TEST] 'In case of Fracture of mandible; alveolar border experiences which force'
+
+--- Medicine | sample 12 | layer 13 ---
+  [ICL 1] 'All are true about salmonella hepatitis except:' → D
+  [ICL 2] 'Bibasilar Velcro crackles occur in ?' → C
+  [ICL 3] 'Following can lead to osteomalacia EXCEPT-' → B
+  [TEST] 'Which of the following structures is not present on the internal surface of mand'
+
+--- Medicine | sample 13 | layer 13 ---
+  [ICL 1] 'Most commonly involved organ in congenital tuberculosis is' → B
+  [ICL 2] 'In severe aoic stenosis true finding is :' → C
+  [ICL 3] 'Brain death is said to occur if there is' → C
+  [TEST] 'A patient presented to emergency with overdose some drug. There were increased s'
+
+--- Medicine | sample 14 | layer 13 ---
+  [ICL 1] 'A 50-year-old woman with SLE presents to the emergency depament with complaints ' → C
+  [ICL 2] 'In shigella dysentery associated hemolytic uremic syndrome, the false statement ' → C
+  [ICL 3] 'A Patient with history of shoness of breath has, Decreased FEVI/FVC Ratio, Norma' → A
+  [TEST] 'According to American association of Endodontics, which of following terminology'
+
+--- Medicine | sample 15 | layer 13 ---
+  [ICL 1] 'All are seen in Addison disease Except' → D
+  [ICL 2] 'Primary pulmonary hypertension has following features on ECG except -' → B
+  [ICL 3] 'Backwash ileitis is seen in' → A
+  [TEST] 'All of the following are synthetic sharpening stone except:'
+
+--- Medicine | sample 16 | layer 13 ---
+  [ICL 1] 'Simple partial motor seizure is diagnosed by the following' → C
+  [ICL 2] 'A 56-year-old female presents with severe chest pain and breathlessness after co' → D
+  [ICL 3] 'HIV-E is more common' → D
+  [TEST] 'Modulus of elasticity of which cement is best to support under complex amalgam r'
+
+--- Medicine | sample 17 | layer 13 ---
+  [ICL 1] 'Backwash ileitis is seen in' → A
+  [ICL 2] 'Pigment gallstones usually not seen in:' → D
+  [ICL 3] 'Trachealization of oesophagus is seen in?' → A
+  [TEST] 'A 50 years old patient presented with progressive jaundice. Liver function test '
+
+--- Medicine | sample 18 | layer 13 ---
+  [ICL 1] 'Destination therapy is given in which condition?' → B
+  [ICL 2] 'All of the following are true in motor aphasia, EXCEPT' → B
+  [ICL 3] 'Gene responsible for resistance to rifampicin' → A
+  [TEST] 'A 2 year old boy has vitamin D refractory rickets. Investigations show serum cal'
+
+--- Medicine | sample 19 | layer 13 ---
+  [ICL 1] 'All of the following statements about chronic constrictive pericarditis are true' → A
+  [ICL 2] 'Backwash ileitis is seen in' → A
+  [ICL 3] 'Best test for Small intestine malabsorption of carbohydrates is -' → C
+  [TEST] 'A radiograph is shown below. This type of root morphology has highest incidence '
+
+--- Surgery | sample 0 | layer 13 ---
+  [ICL 1] "Not a complication of Colles' fracture" → D
+  [ICL 2] "Which of the following is content of Littre's hernia?" → B
+  [ICL 3] 'What should be the approach for doing laparotomy for intra-abdominal injuries?' → B
+  [TEST] 'In case of Fracture of mandible; alveolar border experiences which force'
+
+--- Surgery | sample 1 | layer 13 ---
+  [ICL 1] 'The most common complication after thoracic injury is:' → C
+  [ICL 2] 'Scrambled egg appearance is seen in -' → C
+  [ICL 3] 'An elderly male present with history of dysphagia, regurgitation, foul breath an' → B
+  [TEST] 'Transfusion-associated malaria has a shoer incubation period because of the pres'
+
+--- Surgery | sample 2 | layer 13 ---
+  [ICL 1] 'True regarding breast carcinoma is: March 2008' → C
+  [ICL 2] 'Felon is:' → A
+  [ICL 3] 'The most useful method to diagnose upper GI haemorrhage is -' → D
+  [TEST] 'Cherry red spot and Hollenhorst plaque are seen in:'
+
+--- Surgery | sample 3 | layer 13 ---
+  [ICL 1] 'In a 38 year old male patient with history of road traffic accident, multiple ri' → A
+  [ICL 2] 'Extradural hemorrhage test is-' → A
+  [ICL 3] 'Commonest symptom of carcinoma bronchus is ?' → C
+  [TEST] 'Which of the following techniques is based on RNA?'
+
+--- Surgery | sample 4 | layer 13 ---
+  [ICL 1] 'Commonest symptom of carcinoma bronchus is ?' → C
+  [ICL 2] 'Feline esophagus is seen in:' → A
+  [ICL 3] 'Most common site of lentigo maligna melanoma is' → A
+  [TEST] 'A study finds no significant association between two variables but truly there e'
+
+--- Surgery | sample 5 | layer 13 ---
+  [ICL 1] 'Which of the following is false about watermelon stomach' → D
+  [ICL 2] 'A 45 yrs old man presents with progressive cervical lymph nodes enlargement, sin' → C
+  [ICL 3] 'Complications of fracture () radius are:' → D
+  [TEST] 'Tooth in the mandibular arch which is most likely to be'
+
+--- Surgery | sample 6 | layer 13 ---
+  [ICL 1] 'A man with blunt injury abdomen after road side accident has a blood pressure of' → B
+  [ICL 2] 'A 50 year old male known case of ulcerative colitis presents with distention of ' → A
+  [ICL 3] 'Acute bacterial prostatitis most common organism involved is:' → C
+  [TEST] 'Zone of stimulation contains all except:'
+
+--- Surgery | sample 7 | layer 13 ---
+  [ICL 1] 'Fructose absence in semen analysis suggests:' → B
+  [ICL 2] 'A 41 year old obese female patient comes with acute abdominal pain in the right ' → C
+  [ICL 3] 'What is the treatment of choice for cystosarcoma phylloides?' → A
+  [TEST] 'Dr Bernhard Giesenhagen gave which of the following'
+
+--- Surgery | sample 8 | layer 13 ---
+  [ICL 1] 'Which of the following drugs cause relaxation of LES? 1. Nitrates 2. Histamine b' → B
+  [ICL 2] 'Sentinel lymph node biopsy in carcinoma breast is done if -' → B
+  [ICL 3] 'Paradoxical aciduria seen in?' → B
+  [TEST] 'Pulpectomy and pulp capping are more successful in'
+
+--- Surgery | sample 9 | layer 13 ---
+  [ICL 1] 'True about cystic hygroma -' → A
+  [ICL 2] "As per 'Rule of Nine', each lower limb accounts for how much % of total body sur" → C
+  [ICL 3] 'False about chest trauma' → D
+  [TEST] 'Muscles of mastication are supplied by:'
+
+--- Surgery | sample 10 | layer 13 ---
+  [ICL 1] 'Osteoporosis is caused by all except ?' → A
+  [ICL 2] 'A 50 year old male known case of ulcerative colitis presents with distention of ' → A
+  [ICL 3] 'Which of the following is NOT an indication for surgical interventation in acute' → D
+  [TEST] 'Which of the following conditions is associated with polyhy dramnios?'
+
+--- Surgery | sample 11 | layer 13 ---
+  [ICL 1] 'All are true about cystic hygroma except' → A
+  [ICL 2] 'Operations for varicose veins are best accomplished by-' → A
+  [ICL 3] 'Milan Criteria is used for' → A
+  [TEST] 'In case of Fracture of mandible; alveolar border experiences which force'
+
+--- Surgery | sample 12 | layer 13 ---
+  [ICL 1] 'Treatment of rectal prolapse in childhood is -' → C
+  [ICL 2] 'Turn-buckle cast is used for ?' → C
+  [ICL 3] 'A 25 year male presents with ophthalmologic signs of Thyrotoxicosis. All are pos' → C
+  [TEST] 'Which of the following structures is not present on the internal surface of mand'
+
+--- Surgery | sample 13 | layer 13 ---
+  [ICL 1] 'Gall blader stone formation in influenced by A/E ?' → D
+  [ICL 2] 'Fibroadenoma of the breast are' → D
+  [ICL 3] 'Tumor marker for Ca colon for follow up' → A
+  [TEST] 'A patient presented to emergency with overdose some drug. There were increased s'
+
+--- Surgery | sample 14 | layer 13 ---
+  [ICL 1] 'Pringle manoeuvre may be required for treatment of' → D
+  [ICL 2] 'In a patient with head injury black eye associated with subconjunctival haemorrh' → A
+  [ICL 3] 'All are features of Hypernephroma except' → D
+  [TEST] 'According to American association of Endodontics, which of following terminology'
+
+--- Surgery | sample 15 | layer 13 ---
+  [ICL 1] 'Most desirable structure to anastomose with esophagus is:' → A
+  [ICL 2] 'Not a feature of acute arterial Occlusion -' → A
+  [ICL 3] 'Following are premalignant except -' → B
+  [TEST] 'All of the following are synthetic sharpening stone except:'
+
+--- Surgery | sample 16 | layer 13 ---
+  [ICL 1] 'Which of the following advises is not given to a 35-year-old female patient with' → D
+  [ICL 2] 'Potato nodes are feature of?' → A
+  [ICL 3] "One of the following is associated with Volkmann's ischaemic contractrue" → A
+  [TEST] 'Modulus of elasticity of which cement is best to support under complex amalgam r'
+
+--- Surgery | sample 17 | layer 13 ---
+  [ICL 1] 'Following are premalignant except -' → B
+  [ICL 2] 'Feline esophagus is seen in:' → A
+  [ICL 3] 'Commonest site of thromboangitis obliterans is' → D
+  [TEST] 'A 50 years old patient presented with progressive jaundice. Liver function test '
+
+--- Surgery | sample 18 | layer 13 ---
+  [ICL 1] 'Causes of raised J.V.P. with hypotension are allexcept' → D
+  [ICL 2] "Froment's sign is positive in cases of weakness of ?" → A
+  [ICL 3] 'In transoral sialolithotomy of the submandibular duct, the incision for removal ' → A
+  [TEST] 'A 2 year old boy has vitamin D refractory rickets. Investigations show serum cal'
+
+--- Surgery | sample 19 | layer 13 ---
+  [ICL 1] 'Most common cause of inseional tendonitis of tendoachilles is:' → A
+  [ICL 2] 'Following are premalignant except -' → B
+  [ICL 3] 'Major hazard of having an ectopic testis:' → C
+  [TEST] 'A radiograph is shown below. This type of root morphology has highest incidence '
+
+--- Pharmacology | sample 0 | layer 13 ---
+  [ICL 1] 'Which of the following drug is used for radical cure-' → B
+  [ICL 2] 'Methimazole differ from propylthiouracil in all except-' → C
+  [ICL 3] 'Non-selective serotonin and nor-adrenaline reuptake inhibitor is:' → C
+  [TEST] 'In case of Fracture of mandible; alveolar border experiences which force'
+
+--- Pharmacology | sample 1 | layer 13 ---
+  [ICL 1] 'Nephrotoxicity is seen with :' → B
+  [ICL 2] 'Which of the following drugs have narrow therapeutic index' → D
+  [ICL 3] 'Cough is an adverse reaction seen with intake of:' → C
+  [TEST] 'Transfusion-associated malaria has a shoer incubation period because of the pres'
+
+--- Pharmacology | sample 2 | layer 13 ---
+  [ICL 1] 'Which of the following metabolic reactions require vitamin B12 but not folate?' → A
+  [ICL 2] 'Which of the following is an enzyme inhibitor' → B
+  [ICL 3] 'A female presents with placenta previa with active bleeding and blood pressure o' → B
+  [TEST] 'Cherry red spot and Hollenhorst plaque are seen in:'
+
+--- Pharmacology | sample 3 | layer 13 ---
+  [ICL 1] 'True about orphan drug is ?' → A
+  [ICL 2] 'True about Acetazolamide is ?' → A
+  [ICL 3] 'Antiandrogen pill contains ?' → A
+  [TEST] 'Which of the following techniques is based on RNA?'
+
+--- Pharmacology | sample 4 | layer 13 ---
+  [ICL 1] 'Antiandrogen pill contains ?' → A
+  [ICL 2] 'Treatment of choice for SIADH is ?' → D
+  [ICL 3] 'Therapeutic level of phenytoin is' → B
+  [TEST] 'A study finds no significant association between two variables but truly there e'
+
+--- Pharmacology | sample 5 | layer 13 ---
+  [ICL 1] 'Secukinumab is' → C
+  [ICL 2] 'Drug used in the treatment of gastric ulcer due to H. pylori is:' → C
+  [ICL 3] 'A 25-year-old man has bronchospasm that is exercise induced, paicularly in the c' → C
+  [TEST] 'Tooth in the mandibular arch which is most likely to be'
+
+--- Pharmacology | sample 6 | layer 13 ---
+  [ICL 1] 'Fetal hydantoin syndrome is seen if following drug is used in pregnancy?' → A
+  [ICL 2] 'Duration of action of omeprazole is -' → D
+  [ICL 3] 'Drug of choice  for hypertension with osteoporosis:' → C
+  [TEST] 'Zone of stimulation contains all except:'
+
+--- Pharmacology | sample 7 | layer 13 ---
+  [ICL 1] 'Which one of the following statements is false regarding vincristine -' → C
+  [ICL 2] 'The drug of choice for mushroom poisoning-' → C
+  [ICL 3] 'Bone resorption is enhanced by:' → C
+  [TEST] 'Dr Bernhard Giesenhagen gave which of the following'
+
+--- Pharmacology | sample 8 | layer 13 ---
+  [ICL 1] 'Digoxin action is not affected in' → A
+  [ICL 2] 'True statement regarding Bupivacaine is :' → B
+  [ICL 3] 'This drug has activity against many strains of P. aeruginosa. However, when it i' → C
+  [TEST] 'Pulpectomy and pulp capping are more successful in'
+
+--- Pharmacology | sample 9 | layer 13 ---
+  [ICL 1] 'Longest lag period in bacterial growth is associated with ?' → D
+  [ICL 2] 'Which of the following is an anticoagulant drug ?' → D
+  [ICL 3] 'Drug not used in CHF is:' → B
+  [TEST] 'Muscles of mastication are supplied by:'
+
+--- Pharmacology | sample 10 | layer 13 ---
+  [ICL 1] 'Venlafaxine comes under which class of drugs:' → B
+  [ICL 2] 'Duration of action of omeprazole is -' → D
+  [ICL 3] 'Thiazides and loop diuretics both have opposite action on which of the following' → C
+  [TEST] 'Which of the following conditions is associated with polyhy dramnios?'
+
+--- Pharmacology | sample 11 | layer 13 ---
+  [ICL 1] 'Which of the following is a common side effect of cisplatin?' → B
+  [ICL 2] 'Enalapril increases the levels of which of the  following ?' → A
+  [ICL 3] 'Drug of choice for Hay fever:' → A
+  [TEST] 'In case of Fracture of mandible; alveolar border experiences which force'
+
+--- Pharmacology | sample 12 | layer 13 ---
+  [ICL 1] 'First generation cephalosporins are active against-' → B
+  [ICL 2] 'Fluconazole is more effective than itraconazole in the following systemic fungal' → B
+  [ICL 3] 'Ezetimibe acts by' → B
+  [TEST] 'Which of the following structures is not present on the internal surface of mand'
+
+--- Pharmacology | sample 13 | layer 13 ---
+  [ICL 1] 'Alpha la blocker ?' → A
+  [ICL 2] 'Therapeutic drug monitoring is not needed for?' → A
+  [ICL 3] 'Which of the following regimen of antenatal steroids is preferred for Fetal lung' → A
+  [TEST] 'A patient presented to emergency with overdose some drug. There were increased s'
+
+--- Pharmacology | sample 14 | layer 13 ---
+  [ICL 1] 'A patient having a fungal infection of sinuses and periorbital region with signi' → B
+  [ICL 2] 'All are pharmacogenetic conditions except:' → A
+  [ICL 3] 'Antidote of heparin is' → B
+  [TEST] 'According to American association of Endodontics, which of following terminology'
+
+--- Pharmacology | sample 15 | layer 13 ---
+  [ICL 1] 'Which of following statements about extrapyramidal effects of antipsychotic drug' → D
+  [ICL 2] 'The rationale for sucralfate therapy in peptic ulcers does not include :' → A
+  [ICL 3] 'Which one of the following is a prodrug?' → B
+  [TEST] 'All of the following are synthetic sharpening stone except:'
+
+--- Pharmacology | sample 16 | layer 13 ---
+  [ICL 1] 'Hormone replacement therapy is contraindicated in-' → B
+  [ICL 2] 'Ivacaftor was approved by FDA in 2018 for' → A
+  [ICL 3] 'All are dihydropyridines except:' → C
+  [TEST] 'Modulus of elasticity of which cement is best to support under complex amalgam r'
+
+--- Pharmacology | sample 17 | layer 13 ---
+  [ICL 1] 'Which one of the following is a prodrug?' → B
+  [ICL 2] 'Treatment of choice for SIADH is ?' → D
+  [ICL 3] 'Methylphenindate is drug of choice for:' → B
+  [TEST] 'A 50 years old patient presented with progressive jaundice. Liver function test '
+
+--- Pharmacology | sample 18 | layer 13 ---
+  [ICL 1] 'Which of the following is NOT an adverse effect of cyclosporine?' → D
+  [ICL 2] 'Drug of choice for neutropenia due to cancer chemotherapy is :' → C
+  [ICL 3] 'Alpha methyldopa primarily used for' → A
+  [TEST] 'A 2 year old boy has vitamin D refractory rickets. Investigations show serum cal'
+
+--- Pharmacology | sample 19 | layer 13 ---
+  [ICL 1] 'Which of the following drugs can cause malignant hypehermia?' → D
+  [ICL 2] 'Which one of the following is a prodrug?' → B
+  [ICL 3] 'Hormonal therapy used in breast cancer are: a) Danazol b) Cyproterone acetate c)' → D
+  [TEST] 'A radiograph is shown below. This type of root morphology has highest incidence '
+
+--- Mixed | sample 0 | layer 13 ---
+  [ICL 1] 'Which of the following drug is used for radical cure-' → B
+  [ICL 2] "Which of the following is content of Littre's hernia?" → B
+  [ICL 3] 'Kveim test is used for -' → C
+  [TEST] 'In case of Fracture of mandible; alveolar border experiences which force'
+
+--- Mixed | sample 1 | layer 13 ---
+  [ICL 1] 'Nephrotoxicity is seen with :' → B
+  [ICL 2] 'Scrambled egg appearance is seen in -' → C
+  [ICL 3] 'All of the following are the electrocardiographic features of severe hyperkalemi' → B
+  [TEST] 'Transfusion-associated malaria has a shoer incubation period because of the pres'
+
+--- Mixed | sample 2 | layer 13 ---
+  [ICL 1] 'Which of the following metabolic reactions require vitamin B12 but not folate?' → A
+  [ICL 2] 'Calcitonin is secreted from -' → C
+  [ICL 3] 'The most useful method to diagnose upper GI haemorrhage is -' → D
+  [TEST] 'Cherry red spot and Hollenhorst plaque are seen in:'
+
+--- Mixed | sample 3 | layer 13 ---
+  [ICL 1] 'True about orphan drug is ?' → A
+  [ICL 2] 'Extradural hemorrhage test is-' → A
+  [ICL 3] 'A 56-year-old woman presents with feeling light-headed when standing up and 3 da' → D
+  [TEST] 'Which of the following techniques is based on RNA?'
+
+--- Mixed | sample 4 | layer 13 ---
+  [ICL 1] 'A 56-year-old woman presents with feeling light-headed when standing up and 3 da' → D
+  [ICL 2] 'Feline esophagus is seen in:' → A
+  [ICL 3] 'Therapeutic level of phenytoin is' → B
+  [TEST] 'A study finds no significant association between two variables but truly there e'
+
+--- Mixed | sample 5 | layer 13 ---
+  [ICL 1] 'Secukinumab is' → C
+  [ICL 2] 'Which of the following is not a feature of pseudotumor cerebri?' → D
+  [ICL 3] 'Complications of fracture () radius are:' → D
+  [TEST] 'Tooth in the mandibular arch which is most likely to be'
+
+--- Mixed | sample 6 | layer 13 ---
+  [ICL 1] 'Fetal hydantoin syndrome is seen if following drug is used in pregnancy?' → A
+  [ICL 2] 'Which of the following is not used in diagnosis of insulinoma -' → D
+  [ICL 3] 'Acute bacterial prostatitis most common organism involved is:' → C
+  [TEST] 'Zone of stimulation contains all except:'
+
+--- Mixed | sample 7 | layer 13 ---
+  [ICL 1] 'Fructose absence in semen analysis suggests:' → B
+  [ICL 2] 'Hypophosphatemia is seen in -a) Pseudohypoparathyropdismb) CRFc) Ricketsd) Hyper' → B
+  [ICL 3] 'Bone resorption is enhanced by:' → C
+  [TEST] 'Dr Bernhard Giesenhagen gave which of the following'
+
+--- Mixed | sample 8 | layer 13 ---
+  [ICL 1] 'Which of the following drugs cause relaxation of LES? 1. Nitrates 2. Histamine b' → B
+  [ICL 2] 'True statement regarding Bupivacaine is :' → B
+  [ICL 3] 'Cause of secondary hypeension includes -' → B
+  [TEST] 'Pulpectomy and pulp capping are more successful in'
+
+--- Mixed | sample 9 | layer 13 ---
+  [ICL 1] 'Longest lag period in bacterial growth is associated with ?' → D
+  [ICL 2] 'HIV associated nephropathy is a type of:' → C
+  [ICL 3] 'False about chest trauma' → D
+  [TEST] 'Muscles of mastication are supplied by:'
+
+--- Mixed | sample 10 | layer 13 ---
+  [ICL 1] 'Venlafaxine comes under which class of drugs:' → B
+  [ICL 2] 'Which of the following is not used in diagnosis of insulinoma -' → D
+  [ICL 3] 'Which of the following is NOT an indication for surgical interventation in acute' → D
+  [TEST] 'Which of the following conditions is associated with polyhy dramnios?'
+
+--- Mixed | sample 11 | layer 13 ---
+  [ICL 1] 'Reactive ahritis is usually caused by' → A
+  [ICL 2] 'Enalapril increases the levels of which of the  following ?' → A
+  [ICL 3] 'Milan Criteria is used for' → A
+  [TEST] 'In case of Fracture of mandible; alveolar border experiences which force'
+
+--- Mixed | sample 12 | layer 13 ---
+  [ICL 1] 'All are true about salmonella hepatitis except:' → D
+  [ICL 2] 'Turn-buckle cast is used for ?' → C
+  [ICL 3] 'Ezetimibe acts by' → B
+  [TEST] 'Which of the following structures is not present on the internal surface of mand'
+
+--- Mixed | sample 13 | layer 13 ---
+  [ICL 1] 'Gall blader stone formation in influenced by A/E ?' → D
+  [ICL 2] 'In severe aoic stenosis true finding is :' → C
+  [ICL 3] 'Which of the following regimen of antenatal steroids is preferred for Fetal lung' → A
+  [TEST] 'A patient presented to emergency with overdose some drug. There were increased s'
+
+--- Mixed | sample 14 | layer 13 ---
+  [ICL 1] 'Pringle manoeuvre may be required for treatment of' → D
+  [ICL 2] 'In shigella dysentery associated hemolytic uremic syndrome, the false statement ' → C
+  [ICL 3] 'Antidote of heparin is' → B
+  [TEST] 'According to American association of Endodontics, which of following terminology'
+
+--- Mixed | sample 15 | layer 13 ---
+  [ICL 1] 'Most desirable structure to anastomose with esophagus is:' → A
+  [ICL 2] 'Primary pulmonary hypertension has following features on ECG except -' → B
+  [ICL 3] 'Which one of the following is a prodrug?' → B
+  [TEST] 'All of the following are synthetic sharpening stone except:'
+
+--- Mixed | sample 16 | layer 13 ---
+  [ICL 1] 'Simple partial motor seizure is diagnosed by the following' → C
+  [ICL 2] 'Ivacaftor was approved by FDA in 2018 for' → A
+  [ICL 3] "One of the following is associated with Volkmann's ischaemic contractrue" → A
+  [TEST] 'Modulus of elasticity of which cement is best to support under complex amalgam r'
+
+--- Mixed | sample 17 | layer 13 ---
+  [ICL 1] 'Backwash ileitis is seen in' → A
+  [ICL 2] 'Treatment of choice for SIADH is ?' → D
+  [ICL 3] 'Commonest site of thromboangitis obliterans is' → D
+  [TEST] 'A 50 years old patient presented with progressive jaundice. Liver function test '
+
+--- Mixed | sample 18 | layer 13 ---
+  [ICL 1] 'Destination therapy is given in which condition?' → B
+  [ICL 2] 'Drug of choice for neutropenia due to cancer chemotherapy is :' → C
+  [ICL 3] 'In transoral sialolithotomy of the submandibular duct, the incision for removal ' → A
+  [TEST] 'A 2 year old boy has vitamin D refractory rickets. Investigations show serum cal'
+
+--- Mixed | sample 19 | layer 13 ---
+  [ICL 1] 'Most common cause of inseional tendonitis of tendoachilles is:' → A
+  [ICL 2] 'Which one of the following is a prodrug?' → B
+  [ICL 3] 'Best test for Small intestine malabsorption of carbohydrates is -' → C
+  [TEST] 'A radiograph is shown below. This type of root morphology has highest incidence '
+

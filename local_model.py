@@ -71,6 +71,100 @@ def get_activation(
     return _buffer["act"]
 
 
+def predict_mcq(
+    messages: list[dict],
+) -> tuple[str, dict[str, float]]:
+    """Predict an MCQ answer in a single forward pass.
+
+    Reads the logits at the last token position and finds the probability of
+    each answer letter. Both the bare token ("A") and the space-prefixed token
+    (" A") are checked; the max is taken so the function is robust to whether
+    the chat template leaves a trailing space before the answer slot.
+
+    Returns (predicted_letter, {letter: normalised_probability}).
+    Probabilities are normalised over {A, B, C, D} so they sum to 1 and can
+    be interpreted as the model's relative confidence across answer choices.
+    """
+    text   = tokenizer.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True
+    )
+    inputs = tokenizer(text, return_tensors="pt").to(_device)
+
+    with torch.no_grad():
+        logits = model(**inputs).logits[0, -1, :]   # [vocab_size]
+
+    raw_probs = torch.softmax(logits, dim=-1)
+
+    letter_scores: dict[str, float] = {}
+    for letter in "ABCD":
+        best = 0.0
+        for candidate in (letter, f" {letter}"):
+            ids = tokenizer.encode(candidate, add_special_tokens=False)
+            if len(ids) == 1:
+                best = max(best, raw_probs[ids[0]].item())
+        letter_scores[letter] = best
+
+    total = sum(letter_scores.values()) or 1.0
+    probs = {letter: v / total for letter, v in letter_scores.items()}
+    return max(probs, key=probs.get), probs
+
+
+def classify_output_format(
+    messages: list[dict],
+    categories: dict[str, list[str]],
+) -> str:
+    """Classify which output format the model would use via first-token logits.
+
+    One forward pass; no generation needed. Each category is scored by the
+    maximum softmax probability among its candidate tokens (both bare and
+    space-prefixed forms are checked). Returns the category label whose
+    candidates collectively have the highest max probability.
+    """
+    text   = tokenizer.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True
+    )
+    inputs = tokenizer(text, return_tensors="pt").to(_device)
+
+    with torch.no_grad():
+        logits = model(**inputs).logits[0, -1, :]   # [vocab_size]
+
+    probs = torch.softmax(logits, dim=-1)
+
+    def _max_prob(words: list[str]) -> float:
+        best = 0.0
+        for word in words:
+            for candidate in (word, f" {word}"):
+                ids = tokenizer.encode(candidate, add_special_tokens=False)
+                if len(ids) == 1:
+                    best = max(best, probs[ids[0]].item())
+        return best
+
+    scores = {label: _max_prob(words) for label, words in categories.items()}
+    return max(scores, key=scores.get)
+
+
+def generate_response(messages: list[dict], max_new_tokens: int = 20) -> str:
+    """Greedy decode up to max_new_tokens after the given messages.
+
+    Deterministic (do_sample=False) so outputs are reproducible across
+    conditions. Short generation is enough to capture the format token(s)
+    needed for behavioral superposition classification.
+    """
+    text = tokenizer.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True
+    )
+    inputs = tokenizer(text, return_tensors="pt").to(_device)
+    with torch.no_grad():
+        out_ids = model.generate(
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            do_sample=False,
+            pad_token_id=tokenizer.eos_token_id,
+        )
+    new_ids = out_ids[0][inputs.input_ids.shape[1]:]
+    return tokenizer.decode(new_ids, skip_special_tokens=True).strip()
+
+
 def score_continuation(messages: list[dict], continuation: str) -> float:
     """Log-probability of generating `continuation` as the next tokens after `messages`.
 

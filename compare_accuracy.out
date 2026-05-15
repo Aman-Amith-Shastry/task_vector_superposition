@@ -1,0 +1,33 @@
+Condition: Zero-shot
+    Medicine: 27/100 = 0.27
+    Surgery: 30/100 = 0.30
+    Pharmacology: 44/100 = 0.44
+
+Condition: Medicine
+    Medicine: 56/100 = 0.56 <-- match
+    Surgery: 42/100 = 0.42
+    Pharmacology: 70/100 = 0.70
+
+Condition: Surgery
+    Medicine: 54/100 = 0.54
+    Surgery: 47/100 = 0.47 <-- match
+    Pharmacology: 65/100 = 0.65
+
+Condition: Pharmacology
+    Medicine: 54/100 = 0.54
+    Surgery: 49/100 = 0.49
+    Pharmacology: 70/100 = 0.70 <-- match
+
+=== Accuracy summary (rows = ICL condition, cols = question specialty) ===
+                       Medicine         Surgery    Pharmacology
+      Zero-shot0.27            0.30            0.44            
+       Medicine0.56 *          0.42            0.70            
+        Surgery0.54            0.47 *          0.65            
+   Pharmacology0.54            0.49            0.70 *          
+  * = ICL condition matches question specialty
+
+=== Match vs. mismatch lift ===
+  Medicine: match=0.56  mismatch_avg=0.54  zero-shot=0.27  lift=+0.02
+  Surgery: match=0.47  mismatch_avg=0.45  zero-shot=0.30  lift=+0.02
+  Pharmacology: match=0.70  mismatch_avg=0.68  zero-shot=0.44  lift=+0.02
+Plot saved → accuracy_comparison.png
