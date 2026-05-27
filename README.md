@@ -79,9 +79,15 @@ Three MMLU subject areas sharing the same A/B/C/D output format:
 
 ## Cross-model κ comparison
 
-![κ comparison](results/kappa_comparison_across_models.png)
+**Arithmetic tasks (1B / 3B / 8B):**
 
-Mean κ ± 1 std across all mixed ratios at each relative layer depth. Grey zone = κ ∈ [0.75, 1.25]. Both models show κ close to 1 throughout, with the arithmetic task group showing more layer-dependent variation than MMLU.
+![κ comparison — arithmetic](results/kappa_comparison_across_models.png)
+
+**MMLU semantic domains (1B / 3B):**
+
+![κ comparison — MMLU](results/mmlu_kappa_comparison_across_models.png)
+
+Mean κ ± 1 std across all mixed ratios at each relative layer depth. Grey zone = κ ∈ [0.75, 1.25]. Arithmetic shows more layer-dependent variation; MMLU holds κ ≈ 1 flat across all layers, consistent with the shared A/B/C/D format dominating the contrast vector signal.
 
 ---
 
@@ -123,8 +129,10 @@ python experiments/sweep_mmlu.py
 python experiments/sweep_mmlu.py --model meta-llama/Llama-3.2-1B-Instruct
 
 # Cross-model κ comparison (reads from results/)
-python experiments/plot_kappa_comparison.py                        # arithmetic
-python experiments/plot_kappa_comparison.py --glob "mmlu_kappa_*.json"  # MMLU
+# → saves results/arithmetic_kappa_comparison_across_models.png
+python experiments/plot_kappa_comparison.py
+# → saves results/mmlu_kappa_comparison_across_models.png
+python experiments/plot_kappa_comparison.py --glob "mmlu_kappa_*.json"
 ```
 
 Outputs (PNG figures and κ JSON files) are saved to `results/` automatically.

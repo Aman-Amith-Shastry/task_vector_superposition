@@ -100,7 +100,8 @@ def main():
     ax.grid(axis="y", alpha=0.3)
 
     plt.tight_layout()
-    out = os.path.join(_results_dir, "kappa_comparison_across_models.png")
+    prefix = _args.glob.split("_kappa_")[0] if "_kappa_" in _args.glob else "kappa"
+    out = os.path.join(_results_dir, f"{prefix}_kappa_comparison_across_models.png")
     plt.savefig(out, dpi=150)
     plt.close()
     print(f"Saved → {out}")
