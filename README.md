@@ -81,7 +81,7 @@ Three MMLU subject areas sharing the same A/B/C/D output format:
 
 **Arithmetic tasks (1B / 3B / 8B):**
 
-![κ comparison — arithmetic](results/kappa_comparison_across_models.png)
+![κ comparison — arithmetic](results/arithmetic_kappa_comparison_across_models.png)
 
 **MMLU semantic domains (1B / 3B):**
 
