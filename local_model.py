@@ -1,8 +1,11 @@
+import os
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from langchain_huggingface import HuggingFacePipeline, ChatHuggingFace
 
-MODEL_ID = "meta-llama/Llama-3.2-3B-Instruct"
+MODEL_ID  = os.environ.get("TASK_VECTOR_MODEL",    "meta-llama/Llama-3.2-3B-Instruct")
+# Set TASK_VECTOR_QUANTIZE=int8 or int4 to load a quantized model (recommended for 8B on MPS)
+_QUANTIZE = os.environ.get("TASK_VECTOR_QUANTIZE", "").lower()
 
 _device = (
     "mps" if torch.backends.mps.is_available()
@@ -14,14 +17,27 @@ tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
 if tokenizer.pad_token_id is None:
     tokenizer.pad_token_id = tokenizer.eos_token_id
 
-model = AutoModelForCausalLM.from_pretrained(
-    MODEL_ID,
-    torch_dtype=torch.float16,
-    device_map={"": _device},  # load directly onto MPS, no intermediate CPU copy
-)
+if _QUANTIZE in ("int8", "int4"):
+    from transformers import QuantoConfig
+    _qcfg = QuantoConfig(weights=_QUANTIZE)
+    # quanto quantizes on CPU then moves to device — don't use device_map here
+    model = AutoModelForCausalLM.from_pretrained(
+        MODEL_ID,
+        torch_dtype=torch.float16,
+        quantization_config=_qcfg,
+    )
+    model.to(_device)
+    print(f"Loaded {MODEL_ID} with {_QUANTIZE} quantization")
+else:
+    model = AutoModelForCausalLM.from_pretrained(
+        MODEL_ID,
+        torch_dtype=torch.float16,
+        device_map={"": _device},
+    )
 
 print(f"Model device: {model.device}")
 model.eval()
+n_layers = len(model.model.layers)
 
 _pipe = pipeline(
     "text-generation",
@@ -69,6 +85,119 @@ def get_activation(
         handle.remove()
 
     return _buffer["act"]
+
+
+def get_activations_all_layers(
+    messages: list[dict],
+    layers: list[int],
+    add_generation_prompt: bool = True,
+) -> dict[int, torch.Tensor]:
+    """Residual stream at the last token for every layer in `layers`, one forward pass."""
+    buffer: dict[int, torch.Tensor] = {}
+    handles = []
+
+    for layer in layers:
+        def _hook(module, input, output, _l=layer):
+            hidden = output[0] if isinstance(output, tuple) else output
+            buffer[_l] = (hidden[0, -1, :] if hidden.dim() == 3 else hidden[-1, :]).detach().cpu()
+        handles.append(model.model.layers[layer].register_forward_hook(_hook))
+
+    try:
+        text = tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=add_generation_prompt
+        )
+        inputs = tokenizer(text, return_tensors="pt").to(_device)
+        with torch.no_grad():
+            model(**inputs)
+    finally:
+        for h in handles:
+            h.remove()
+
+    return buffer
+
+
+def predict_mcq_with_injection(
+    messages: list[dict],
+    task_vector: torch.Tensor,
+    layer: int,
+    alpha: float = 2.0,
+) -> tuple[str, dict[str, float]]:
+    """predict_mcq with `task_vector` additively injected at `layer`.
+
+    The hook fires at `layer`, adds alpha * task_vector to the last-token
+    hidden state, and the modified representation propagates through all
+    subsequent layers. Equivalent to ELICIT's h̃_l = h_l + α·θ_l.
+    """
+    tv = task_vector.to(_device)
+
+    def _hook(module, input, output):
+        hidden = output[0] if isinstance(output, tuple) else output
+        if hidden.dim() == 3:
+            hidden[:, -1, :] = hidden[:, -1, :] + alpha * tv
+        else:
+            hidden[-1, :] = hidden[-1, :] + alpha * tv
+        return (hidden,) + output[1:] if isinstance(output, tuple) else hidden
+
+    handle = model.model.layers[layer].register_forward_hook(_hook)
+    try:
+        result = predict_mcq(messages)
+    finally:
+        handle.remove()
+    return result
+
+
+def predict_constrained(
+    messages: list[dict],
+    candidates: list[str],
+) -> str:
+    """Return the highest-probability candidate at the next-token position.
+
+    Each candidate is checked both bare ("yes") and space-prefixed (" yes").
+    Only single-token candidates are scored; multi-token strings are skipped.
+    """
+    text   = tokenizer.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True
+    )
+    inputs = tokenizer(text, return_tensors="pt").to(_device)
+    with torch.no_grad():
+        logits = model(**inputs).logits[0, -1, :]
+    probs  = torch.softmax(logits, dim=-1)
+
+    scores: dict[str, float] = {}
+    for cand in candidates:
+        best = 0.0
+        for variant in (cand, f" {cand}"):
+            ids = tokenizer.encode(variant, add_special_tokens=False)
+            if len(ids) == 1:
+                best = max(best, probs[ids[0]].item())
+        scores[cand] = best
+    return max(scores, key=scores.get)
+
+
+def predict_constrained_with_injection(
+    messages: list[dict],
+    candidates: list[str],
+    task_vector: torch.Tensor,
+    layer: int,
+    alpha: float = 2.0,
+) -> str:
+    """predict_constrained with `task_vector` injected at `layer`."""
+    tv = task_vector.to(_device)
+
+    def _hook(module, input, output):
+        hidden = output[0] if isinstance(output, tuple) else output
+        if hidden.dim() == 3:
+            hidden[:, -1, :] = hidden[:, -1, :] + alpha * tv
+        else:
+            hidden[-1, :] = hidden[-1, :] + alpha * tv
+        return (hidden,) + output[1:] if isinstance(output, tuple) else hidden
+
+    handle = model.model.layers[layer].register_forward_hook(_hook)
+    try:
+        result = predict_constrained(messages, candidates)
+    finally:
+        handle.remove()
+    return result
 
 
 def predict_mcq(
@@ -163,6 +292,41 @@ def generate_response(messages: list[dict], max_new_tokens: int = 20) -> str:
         )
     new_ids = out_ids[0][inputs.input_ids.shape[1]:]
     return tokenizer.decode(new_ids, skip_special_tokens=True).strip()
+
+
+def generate_response_with_injection(
+    messages: list[dict],
+    task_vector: torch.Tensor,
+    layer: int,
+    alpha: float = 2.0,
+    max_new_tokens: int = 10,
+) -> str:
+    """generate_response with `task_vector` injected at `layer` on the first pass only.
+
+    The hook fires once — at the initial prefill step where the last token is
+    the assistant header. Subsequent autoregressive steps are unmodified so the
+    injection steers the first generated token without corrupting the rest of
+    the decoding loop.
+    """
+    tv    = task_vector.to(_device)
+    fired = [False]
+
+    def _hook(module, input, output):
+        if not fired[0]:
+            hidden = output[0] if isinstance(output, tuple) else output
+            if hidden.dim() == 3:
+                hidden[:, -1, :] = hidden[:, -1, :] + alpha * tv
+            else:
+                hidden[-1, :] = hidden[-1, :] + alpha * tv
+            fired[0] = True
+            return (hidden,) + output[1:] if isinstance(output, tuple) else hidden
+
+    handle = model.model.layers[layer].register_forward_hook(_hook)
+    try:
+        result = generate_response(messages, max_new_tokens=max_new_tokens)
+    finally:
+        handle.remove()
+    return result
 
 
 def score_continuation(messages: list[dict], continuation: str) -> float:
