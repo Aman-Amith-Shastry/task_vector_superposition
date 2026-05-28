@@ -2,7 +2,7 @@
 
 Empirical study of whether ICL examples induce **linearly superposed task representations** in transformer residual streams, and whether that linearity is quantifiable, robust across task types, and consistent across model scales.
 
-Inspired by [Everything Everywhere All at Once (Hendel et al., 2023)](https://arxiv.org/abs/2310.15916). Extends prior qualitative work with a quantitative metric (κ), a controlled experimental design using contrast vectors, and cross-scale validation across the Llama-3 family (1B / 3B / 8B).
+Inspired by [Everything Everywhere All at Once (Hendel et al., 2023)](https://arxiv.org/abs/2410.05603). Extends prior qualitative work with a quantitative metric (κ), a controlled experimental design using contrast vectors, and cross-scale validation across the Llama-3 family (1B / 3B / 8B).
 
 ---
 
