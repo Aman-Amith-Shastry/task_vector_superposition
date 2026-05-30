@@ -91,6 +91,79 @@ Mean κ ± 1 std across all mixed ratios at each relative layer depth. Grey zone
 
 ---
 
+## Experiment 3 — Inverse superposition: recovering task mixture from contrast vectors
+
+If task vectors superpose linearly, the mapping from ICL ratio → contrast vector should be invertible: given a contrast vector from an unknown prompt, we can recover the mixing coefficients α that produced it.
+
+### Method
+
+For a probe contrast vector `x` and stored pure-task centroids `c₁, c₂, c₃`, solve:
+
+```
+x ≈ α₁·c₁ + α₂·c₂ + α₃·c₃    subject to  α₁ + α₂ + α₃ = 1
+```
+
+via reparametrised OLS (eliminates one variable, enforces sum-to-1 exactly without a constrained solver):
+
+```
+x − c₃ ≈ α₁·(c₁ − c₃) + α₂·(c₂ − c₃)
+α₃ = 1 − α₁ − α₂
+```
+
+**Critical requirement:** centroid extraction and probe extraction must use identical `rotate_test` protocol. Without this, the ICL-test interaction term is not removed by the zero-shot subtraction and introduces systematic bias — even though the zero-shot baseline is subtracted.
+
+### Layer selection
+
+The optimal layer for decomposition balances two criteria:
+
+- **Norm balance** — equal centroid norms avoid magnitude-driven bias toward any single task
+- **Geometric separability** — centroids must be far enough apart for precise decomposition (low condition number)
+
+The `--select_layer` flag scans all stored layers, runs the three pure conditions at each, and reports norm spread, condition number, and mean L2 error to identify the best layer automatically.
+
+### Results — arithmetic (layer 1)
+
+Pure-task conditions are recovered near-perfectly. Mixed ratios are directionally correct with larger errors in equal-mix conditions.
+
+| Ratio | True weights | Inferred α | L2 error |
+|---|---|---|---|
+| 3-0-0 | Direct=1.00 | Direct=1.000 | 0.002 |
+| 0-3-0 | MCQ=1.00 | MCQ=0.998 | 0.002 |
+| 0-0-3 | Verification=1.00 | Verification=1.027 | 0.034 |
+| 0-2-1 | MCQ=0.67, Ver=0.33 | MCQ=0.678, Ver=0.321 | 0.016 |
+| 0-1-2 | MCQ=0.33, Ver=0.67 | MCQ=0.328, Ver=0.702 | 0.046 |
+
+### Results — MMLU semantic domains (layer 10)
+
+Despite all three domains sharing the same A/B/C/D output format, the decomposition recovers mixture coefficients with low error — including the equal 1-1-1 mix.
+
+| Ratio | True weights | Inferred α | L2 error |
+|---|---|---|---|
+| 3-0-0 | History=1.00 | History=0.971 | 0.059 |
+| 0-3-0 | Law=1.00 | Law=1.019 | 0.061 |
+| 0-0-3 | ML=1.00 | ML=0.936 | 0.092 |
+| 1-1-1 | all=0.33 | H=0.371, L=0.304, ML=0.325 | 0.049 |
+| 2-0-1 | History=0.67, ML=0.33 | H=0.675, ML=0.354 | 0.037 |
+
+MMLU decomposition is notably cleaner than arithmetic for equal-mix conditions, because the shared format means contrast vectors are closer in direction and the mixing geometry is more symmetric.
+
+### Usage
+
+```bash
+# Find optimal layer automatically
+python experiments/task_vector_injection/decompose_task_mixture.py --select_layer
+python experiments/task_vector_injection/decompose_task_mixture.py --experiment mmlu --select_layer
+
+# Sweep all 10 simplex ratios at the best layer
+python experiments/task_vector_injection/decompose_task_mixture.py --layer 1 --sweep
+python experiments/task_vector_injection/decompose_task_mixture.py --experiment mmlu --layer 10 --sweep
+
+# Probe a specific ratio
+python experiments/task_vector_injection/decompose_task_mixture.py --ratio 2 1 0
+```
+
+---
+
 ## Background
 
 Early exploratory work (archived) tested the same superposition hypothesis on medical specialty tasks (Medicine / Surgery / Pharmacology from MedMCQA) and format-distinct clinical tasks (MCQ / PubMedQA / Symptom2Disease). Those experiments established the initial observation of linear superposition and identified that optimal layer depth differs by task type (early layers for format differences, middle layers for semantic differences). The arithmetic and MMLU experiments were designed with tighter experimental controls and the quantitative κ framework.
@@ -109,7 +182,11 @@ Early exploratory work (archived) tested the same superposition hypothesis on me
 ├── experiments/
 │   ├── sweep_arithmetic.py          # ratio + layer sweep, arithmetic tasks
 │   ├── sweep_mmlu.py                # ratio + layer sweep, MMLU semantic domains
-│   └── plot_kappa_comparison.py     # cross-model κ comparison plot
+│   ├── plot_kappa_comparison.py     # cross-model κ comparison plot
+│   └── task_vector_injection/
+│       ├── extract_vectors.py           # contrast vector extraction, MMLU
+│       ├── extract_arithmetic_vectors.py # contrast vector extraction, arithmetic
+│       └── decompose_task_mixture.py    # inverse superposition via reparametrised OLS
 ├── results/                         # output figures and κ JSON files
 └── archive/                         # earlier exploratory experiments
 ```
