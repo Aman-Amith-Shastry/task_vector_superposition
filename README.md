@@ -125,25 +125,35 @@ The `--select_layer` flag scans all stored layers, runs the three pure condition
 
 Pure-task conditions are recovered near-perfectly. Mixed ratios are directionally correct with larger errors in equal-mix conditions.
 
-| Ratio | True weights | Inferred α | L2 error |
+| Ratio | True weights (H, L, ML) | Inferred α (H, L, ML) | L2 error |
 |---|---|---|---|
-| 3-0-0 | Direct=1.00 | Direct=1.000 | 0.002 |
-| 0-3-0 | MCQ=1.00 | MCQ=0.998 | 0.002 |
-| 0-0-3 | Verification=1.00 | Verification=1.027 | 0.034 |
-| 0-2-1 | MCQ=0.67, Ver=0.33 | MCQ=0.678, Ver=0.321 | 0.016 |
-| 0-1-2 | MCQ=0.33, Ver=0.67 | MCQ=0.328, Ver=0.702 | 0.046 |
+| 3-0-0 | 1, 0, 0 | 1.000, 0, 0 | 0.001 |
+| 0-3-0 | 0, 1, 0 | 0.001, 0.997, 0.004 | 0.005 |
+| 0-0-3 | 0, 0, 1 | -0.019, -0.010, 1.029 | 0.036 |
+| 2-1-0 | 0.67, 0.33, 0 | 0.565, 0.388, 0.047 | 0.125 |
+| 1-2-0 | 0.33, 0.67, 0 | 0.239, 0.739, 0.022 | 0.121 |
+| 0-2-1 | 0, 0.67, 0.33 | -0.001, 0.677, 0.324 | 0.014 |
+| 0-1-2 | 0, 0.33, 0.67 | -0.030, 0.326, 0.704 | 0.049 |
+| 2-0-1 | 0.67, 0, 0.33 | 0.604, -0.010, 0.406 | 0.096 |
+| 1-0-2 | 0.33, 0, 0.67 | 0.258, -0.012, 0.754 | 0.116 |
+| 1-1-1 | all=0.33 | 0.263, 0.383, 0.354 | 0.087 |
 
 ### Results — MMLU semantic domains (layer 10)
 
 Despite all three domains sharing the same A/B/C/D output format, the decomposition recovers mixture coefficients with low error — including the equal 1-1-1 mix.
 
-| Ratio | True weights | Inferred α | L2 error |
+| Ratio | True weights (H, L, ML) | Inferred α (H, L, ML) | L2 error |
 |---|---|---|---|
-| 3-0-0 | History=1.00 | History=0.971 | 0.059 |
-| 0-3-0 | Law=1.00 | Law=1.019 | 0.061 |
-| 0-0-3 | ML=1.00 | ML=0.936 | 0.092 |
-| 1-1-1 | all=0.33 | H=0.371, L=0.304, ML=0.325 | 0.049 |
-| 2-0-1 | History=0.67, ML=0.33 | H=0.675, ML=0.354 | 0.037 |
+| 3-0-0 | 1, 0, 0 | 0.959, 0.042, -0.001 | 0.059 |
+| 0-3-0 | 0, 1, 0 | -0.015, 1.020, -0.005 | 0.026 |
+| 0-0-3 | 0, 0, 1 | 0.020, 0.009, 0.971 | 0.037 |
+| 2-1-0 | 0.67, 0.33, 0 | 0.664, 0.341, -0.005 | 0.010 |
+| 1-2-0 | 0.33, 0.67, 0 | 0.330, 0.664, 0.006 | 0.007 |
+| 0-2-1 | 0, 0.67, 0.33 | 0.037, 0.690, 0.273 | 0.074 |
+| 0-1-2 | 0, 0.33, 0.67 | 0.041, 0.330, 0.629 | 0.056 |
+| 2-0-1 | 0.67, 0, 0.33 | 0.670, 0.020, 0.350 | 0.026 |
+| 1-0-2 | 0.33, 0, 0.67 | 0.356, 0.037, 0.681 | 0.0453 |
+| 1-1-1 | all=0.33 | 0.365, 0.315, 0.320 | 0.039 |
 
 MMLU decomposition is notably cleaner than arithmetic for equal-mix conditions, because the shared format means contrast vectors are closer in direction and the mixing geometry is more symmetric.
 
