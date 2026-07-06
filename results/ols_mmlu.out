@@ -1,0 +1,91 @@
+Model device: mps:0
+Experiment : mmlu  |  Tasks: ['History', 'Law', 'ML']
+
+Loading data pools...
+  Loading MMLU high_school_world_history...
+  Loading MMLU professional_law...
+  Loading MMLU machine_learning...
+Layer      : 18  |  n_samples: 50
+Loading stored centroids at layer 18...
+
+Ratio 3-0-0  (History=1.00, Law=0.00, ML=0.00)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    History        α=+0.995  (true 1.00)  95% CI [+0.924, +1.070]
+    Law            α=+0.022  (true 0.00)  95% CI [-0.050, +0.098]
+    ML             α=-0.017  (true 0.00)  95% CI [-0.091, +0.057]
+    L2 error: 0.0280
+
+Ratio 0-3-0  (History=0.00, Law=1.00, ML=0.00)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    History        α=+0.049  (true 0.00)  95% CI [-0.036, +0.132]
+    Law            α=+1.005  (true 1.00)  95% CI [+0.921, +1.089]
+    ML             α=-0.054  (true 0.00)  95% CI [-0.119, +0.016]
+    L2 error: 0.0737
+
+Ratio 0-0-3  (History=0.00, Law=0.00, ML=1.00)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    History        α=+0.079  (true 0.00)  95% CI [-0.020, +0.168]
+    Law            α=+0.004  (true 0.00)  95% CI [-0.059, +0.078]
+    ML             α=+0.917  (true 1.00)  95% CI [+0.845, +0.994]
+    L2 error: 0.1153
+
+Ratio 2-1-0  (History=0.67, Law=0.33, ML=0.00)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    History        α=+0.742  (true 0.67)  95% CI [+0.657, +0.824]
+    Law            α=+0.261  (true 0.33)  95% CI [+0.182, +0.339]
+    ML             α=-0.004  (true 0.00)  95% CI [-0.075, +0.069]
+    L2 error: 0.1043
+
+Ratio 1-2-0  (History=0.33, Law=0.67, ML=0.00)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    History        α=+0.405  (true 0.33)  95% CI [+0.322, +0.491]
+    Law            α=+0.585  (true 0.67)  95% CI [+0.505, +0.672]
+    ML             α=+0.009  (true 0.00)  95% CI [-0.051, +0.072]
+    L2 error: 0.1090
+
+Ratio 0-2-1  (History=0.00, Law=0.67, ML=0.33)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    History        α=+0.058  (true 0.00)  95% CI [-0.047, +0.160]
+    Law            α=+0.675  (true 0.67)  95% CI [+0.588, +0.775]
+    ML             α=+0.267  (true 0.33)  95% CI [+0.206, +0.324]
+    L2 error: 0.0886
+
+Ratio 0-1-2  (History=0.00, Law=0.33, ML=0.67)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    History        α=+0.082  (true 0.00)  95% CI [-0.031, +0.185]
+    Law            α=+0.308  (true 0.33)  95% CI [+0.225, +0.408]
+    ML             α=+0.610  (true 0.67)  95% CI [+0.540, +0.678]
+    L2 error: 0.1030
+
+Ratio 2-0-1  (History=0.67, Law=0.00, ML=0.33)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    History        α=+0.699  (true 0.67)  95% CI [+0.612, +0.787]
+    Law            α=-0.024  (true 0.00)  95% CI [-0.099, +0.057]
+    ML             α=+0.325  (true 0.33)  95% CI [+0.244, +0.400]
+    L2 error: 0.0413
+
+Ratio 1-0-2  (History=0.33, Law=0.00, ML=0.67)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    History        α=+0.386  (true 0.33)  95% CI [+0.290, +0.477]
+    Law            α=-0.030  (true 0.00)  95% CI [-0.103, +0.052]
+    ML             α=+0.644  (true 0.67)  95% CI [+0.567, +0.722]
+    L2 error: 0.0650
+
+Ratio 1-1-1  (History=0.33, Law=0.33, ML=0.33)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    History        α=+0.412  (true 0.33)  95% CI [+0.318, +0.507]
+    Law            α=+0.255  (true 0.33)  95% CI [+0.173, +0.347]
+    ML             α=+0.333  (true 0.33)  95% CI [+0.264, +0.394]
+    L2 error: 0.1112
+
+Done.

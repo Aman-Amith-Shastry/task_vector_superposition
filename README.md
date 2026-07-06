@@ -1,182 +1,159 @@
-# Task Vector Superposition in LLMs
+# Empirical Verification of Linear Task Superposition in LLMs
 
-Empirical study of whether ICL examples induce **linearly superposed task representations** in transformer residual streams, and whether that linearity is quantifiable, robust across task types, and consistent across model scales.
+An empirical study of whether In-Context Learning (ICL) examples induce **linearly superposed task representations** in transformer residual streams, whether that linearity is quantifiable and statistically significant, and whether it is **causally functional**.
 
-Inspired by [Everything Everywhere All at Once (Xiong et al., 2024)](https://arxiv.org/abs/2410.05603). Extends prior qualitative work with a quantitative metric (κ), a controlled experimental design using contrast vectors, and cross-scale validation across the Llama-3 family (1B / 3B / 8B).
+When in-context examples span multiple tasks, LLMs represent and perform all of them at once — *task superposition*. Prior work posits that this superposition is a **convex combination** of individual task vectors, but this had not been directly verified at the activation level in instruction-tuned models. We verify it three ways:
+
+1. **Geometry (κ).** Mixed-task contrast-vector centroids land on the ratio-weighted convex combination of the pure-task centroids (κ ≈ 1), calibrated against an **exact permutation null** — significant at the floor *p* = 1/720 for every model, task group, and layer.
+2. **Recoverability (OLS).** The true mixture ratio of a mixed-task prompt is recoverable from the pure-task centroids via reparameterized OLS, with no prior knowledge of the task distribution.
+3. **Causality (injection).** Injecting the convex combination of pure-task vectors into a task-free prompt shifts model behavior toward the injected ratio's ICL distribution — significant at permutation *p* = 0.0001 in every condition, in two model families.
+
+Inspired by [*Everything Everywhere All at Once* (Xiong et al., 2024)](https://arxiv.org/abs/2410.05603), which established task superposition **behaviorally** in pretrained models. Behavioral superposition is a claim about *outputs* and does not by itself entail that the underlying representations **combine linearly**; we test the representations directly.
+
+**Models (three families, 1B–8B):** Llama-3.2-1B, Llama-3.2-3B, Llama-3.1-8B, Gemma-2-2B, Qwen-2.5-3B (instruction-tuned variants).
 
 ---
 
 ## Core methodology
 
+**Task vectors** are the raw activations of the assistant header in the residual stream.
 **Contrast vectors** isolate the ICL signal by subtracting the zero-shot baseline:
 
 ```
 contrast(ICL) = activation(ICL + test_q) − activation(test_q alone)
 ```
 
-This removes the test question's independent contribution, leaving only the shift caused by the ICL context. The zero-shot activation is precomputed once per sample and reused across all ratios (reduces forward passes by ~45%).
+This removes the test question's independent contribution, leaving only the shift caused by the ICL context. The zero-shot activation is precomputed once per sample and reused across all ratios.
 
-**Test question rotation** applies uniformly to all conditions (pure and mixed), so the test question's format never creates an asymmetric confound between conditions.
-
-**κ (linear superposition fidelity)** quantifies how closely the actual mixed centroid tracks the ratio-weighted linear combination of pure-task centroids:
+**κ (linear superposition fidelity)** quantifies how closely the actual mixed centroid tracks the ratio-weighted linear combination of pure-task centroids. For a given in-context task ratio:
+* `predicted` = the ratio-weighted average of the pure-task centroids
+* `actual` = the true centroid of the samples at that in-context ratio
+* `center` = the arithmetic mean of the pure-task centroids
 
 ```
 κ = dot(actual − center, predicted − center) / ‖predicted − center‖²
 ```
 
-κ = 1 means perfect linear combination; κ = 0 means no mixing. Undefined (shown as —) when the predicted position is too close to the triangle center (e.g. equal 1-1-1 ratio), where the denominator is numerically unstable.
+κ = 1 means perfect linear combination; κ = 0 means orthogonal (no linear tracking); κ is signed and unbounded by design, so it *could* be negative or ≫ 1. κ is undefined for the equal 1-1-1 ratio (predicted = center, denominator = 0) and excluded there. All κ is computed in the **original activation space**, not the LDA projection used for the scatter plots.
+
+**Exact permutation null.** κ ≈ 1 could in principle be an artifact of the metric's scale, so we calibrate it. For the *K* = 6 mixed ratios with a well-defined predicted displacement (the three pure ratios form the basis; 1-1-1 is excluded), we re-pair each observed displacement with a permuted prediction and score the mean κ. With 6! = 720 relabelings we enumerate the null **exactly**; the observed pairing beating all others gives the floor *p* = 1/720 ≈ 1.4 × 10⁻³. See [`experiments/kappa_null.py`](experiments/kappa_null.py).
 
 ---
 
-## Experiment 1 — Arithmetic format tasks
+## Task groups
 
-Three structurally distinct output formats applied to the same arithmetic inputs:
+Three groups probe superposition under different kinds of task difference.
 
-| Task | Format | Example output |
+| Group | Tasks | Shared surface form | Tests separability of… |
+|---|---|---|---|
+| **Arithmetic** | Direct (`42`) · MCQ (`B`) · Verification (`True`) | same arithmetic inputs, different output *format* | **format** structure (early-layer signal) |
+| **Entity** | Capital (`France→Paris`) · Currency (`France→Euro`) · Language (`France→French`) | a bare country name; no scaffolding | **semantic relation** under an underspecified prompt |
+| **MMLU** | History · Law · ML | identical A/B/C/D format | **semantic domain** only (hardest case) |
+
+In-context ratios sweep the 10 points of the 3-task simplex summing to 3: three pures (3-0-0, 0-3-0, 0-0-3), six 2-1-0 mixes, and the equal 1-1-1.
+
+---
+
+## Result 1 — Geometry: κ ≈ 1 everywhere, rejected against the exact null
+
+**Mean κ across all mixed ratios and swept layers** (— = not run; Llama-8B/MMLU omitted for hardware):
+
+| Model | Arithmetic | Entity | MMLU |
+|---|---|---|---|
+| Llama-3.2-1B | 1.051 | 0.983 | 0.977 |
+| Llama-3.2-3B | 0.994 | 1.016 | 1.006 |
+| Llama-3.1-8B | 0.997 | 0.930 | — |
+| Gemma-2-2B | 1.014 | 1.038 | 0.980 |
+| Qwen-2.5-3B | 1.051 | 1.033 | 0.964 |
+
+**In every cell above, at every one of the 8 swept layers, the observed mean κ exceeds all 720 permutations** → floor *p* = 1/720 ≈ 1.4 × 10⁻³, against a null centered near 0. The convex-combination hypothesis is rejected in favor of genuine linear superposition across all models and task groups.
+
+### Cross-model κ vs. relative layer depth
+
+Mean κ ± 1 std across mixed ratios at each relative depth; grey band = κ ∈ [0.75, 1.25].
+
+| Arithmetic | Entity | MMLU |
 |---|---|---|
-| Direct | Free-form number | `42` |
-| MCQ | Letter choice | `B` |
-| Verification | True/False | `True` |
+| ![κ arithmetic](results/arithmetic_kappa_comparison_across_models.png) | ![κ entity](results/entity_kappa_comparison_across_models.png) | ![κ mmlu](results/mmlu_kappa_comparison_across_models.png) |
 
-**Why this task group:** Format differences create strong early-layer separability. Any superposition signal is not confounded by shared output structure.
+Format-varying **Arithmetic** shows the largest κ-variance growth with depth; semantic **MMLU** holds κ ≈ 1 nearly flat. Qwen and Gemma replicate the Llama pattern despite different architectures, training data, and tokenizers — supporting cross-family generalizability.
 
-### Layer sweep (8 layers, relative depth fractions)
+### Layer-sweep projections (LDA, 8 relative depths)
 
-Layers are chosen as fixed fractions of model depth (0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.65, 0.75), so results are directly comparable across model sizes.
+Large dots = pure-task centroids, small dots = samples, × = ratio-predicted centroid, dotted line = predicted→actual gap, κ annotated per mixed ratio.
 
-| Model | Layer sweep |
-|---|---|
-| Llama-3.2-1B | ![arithmetic 1B](results/arithmetic_layer_sweep_projections_1B_rotated.png) |
-| Llama-3.2-3B | ![arithmetic 3B](results/arithmetic_layer_sweep_projections_3B_rotated.png) |
-| Llama-3.1-8B | ![arithmetic 8B](results/arithmetic_layer_sweep_projections_8B_rotated.png) |
+**Arithmetic**
 
-Each panel: large dots = pure-task centroids, small dots = individual samples, × = ratio-predicted centroid, dotted line = gap between predicted and actual. κ values annotated per mixed ratio.
+| Llama-1B | Llama-3B | Llama-8B | Gemma-2B | Qwen-3B |
+|---|---|---|---|---|
+| ![](results/arithmetic_layer_sweep_projections_Llama-1B_rotated.png) | ![](results/arithmetic_layer_sweep_projections_Llama-3B_rotated.png) | ![](results/arithmetic_layer_sweep_projections_Llama-8B_rotated.png) | ![](results/arithmetic_layer_sweep_projections_Gemma-2B_rotated.png) | ![](results/arithmetic_layer_sweep_projections_Qwen-3B_rotated.png) |
 
----
+**Entity**
 
-## Experiment 2 — MMLU semantic domains
+| Llama-1B | Llama-3B | Llama-8B | Gemma-2B | Qwen-3B |
+|---|---|---|---|---|
+| ![](results/entity_layer_sweep_projections_Llama-1B_rotated.png) | ![](results/entity_layer_sweep_projections_Llama-3B_rotated.png) | ![](results/entity_layer_sweep_projections_Llama-8B_rotated.png) | ![](results/entity_layer_sweep_projections_Gemma-2B_rotated.png) | ![](results/entity_layer_sweep_projections_Qwen-3B_rotated.png) |
 
-Three MMLU subject areas sharing the same A/B/C/D output format:
+**MMLU**
 
-| Task | Domain |
-|---|---|
-| History | World history, political history |
-| Law | Constitutional law, legal reasoning |
-| ML | Machine learning, statistics |
-
-**Why this task group:** Identical output format means any separability reflects semantic domain differences only — a harder test for superposition than format differences.
-
-### Layer sweep (8 layers, relative depth fractions)
-
-| Model | Layer sweep |
-|---|---|
-| Llama-3.2-1B | ![mmlu 1B](results/mmlu_layer_sweep_projections_1B_rotated.png) |
-| Llama-3.2-3B | ![mmlu 3B](results/mmlu_layer_sweep_projections_3B_rotated.png) |
-
-**Key finding:** κ ≈ 1 consistently across all layers for both models, with no strong layer-depth trend. This contrasts with arithmetic, where layer-dependent structure is more pronounced — consistent with format identity being encoded earlier (structural signal) and semantic identity being more distributed.
+| Llama-1B | Llama-3B | Gemma-2B | Qwen-3B |
+|---|---|---|---|
+| ![](results/mmlu_layer_sweep_projections_Llama-1B_rotated.png) | ![](results/mmlu_layer_sweep_projections_Llama-3B_rotated.png) | ![](results/mmlu_layer_sweep_projections_Gemma-2B_rotated.png) | ![](results/mmlu_layer_sweep_projections_Qwen-3B_rotated.png) |
 
 ---
 
-## Cross-model κ comparison
+## Result 2 — Recoverability: inferring the mixture ratio via OLS
 
-**Arithmetic tasks (1B / 3B / 8B):**
-
-![κ comparison — arithmetic](results/arithmetic_kappa_comparison_across_models.png)
-
-**MMLU semantic domains (1B / 3B):**
-
-![κ comparison — MMLU](results/mmlu_kappa_comparison_across_models.png)
-
-Mean κ ± 1 std across all mixed ratios at each relative layer depth. Grey zone = κ ∈ [0.75, 1.25]. Arithmetic shows more layer-dependent variation; MMLU holds κ ≈ 1 flat across all layers, consistent with the shared A/B/C/D format dominating the contrast vector signal.
-
----
-
-## Experiment 3 — Inverse superposition: recovering task mixture from contrast vectors
-
-If task vectors superpose linearly, the mapping from ICL ratio → contrast vector should be invertible: given a contrast vector from an unknown prompt, we can recover the mixing coefficients α that produced it.
-
-### Method
-
-For a probe contrast vector `x` and stored pure-task centroids `c₁, c₂, c₃`, solve:
+If task vectors superpose linearly, the map ICL ratio → contrast vector is invertible: given a contrast vector from an unknown prompt, recover the mixing coefficients α. For a probe `x` and pure-task centroids `c₁, c₂, c₃`, solve
 
 ```
 x ≈ α₁·c₁ + α₂·c₂ + α₃·c₃    subject to  α₁ + α₂ + α₃ = 1
 ```
 
-via reparametrised OLS (eliminates one variable, enforces sum-to-1 exactly without a constrained solver):
+via **reparameterized OLS** (eliminate one variable to enforce sum-to-1 exactly, *without* imposing non-negativity — so non-negativity of the recovered α is a *testable outcome*, not a baked-in constraint):
 
 ```
-x − c₃ ≈ α₁·(c₁ − c₃) + α₂·(c₂ − c₃)
-α₃ = 1 − α₁ − α₂
+x − c₃ ≈ α₁·(c₁ − c₃) + α₂·(c₂ − c₃);   α₃ = 1 − α₁ − α₂
 ```
 
-**Critical requirement:** centroid extraction and probe extraction must use identical `rotate_test` protocol. Without this, the ICL-test interaction term is not removed by the zero-shot subtraction and introduces systematic bias — even though the zero-shot baseline is subtracted.
+The decomposition layer is chosen **only from the three pure ratios** (lowest reconstruction error); mixed ratios are held out for evaluation. Recovered coefficients (Llama-3.2-3B) plotted against ground truth — points on the identity line = exact recovery:
 
-### Layer selection
+| Arithmetic (layer 3) | Entity (layer 18) | MMLU (layer 18) |
+|---|---|---|
+| ![OLS arithmetic](results/ols_arith_expected.png) | ![OLS entity](results/ols_entity_expected.png) | ![OLS mmlu](results/ols_mmlu_expected.png) |
 
-The optimal layer for decomposition balances two criteria:
+**Per-ratio L2 error across task groups:**
 
-- **Norm balance** — equal centroid norms avoid magnitude-driven bias toward any single task
-- **Geometric separability** — centroids must be far enough apart for precise decomposition (low condition number)
+![OLS L2 error](results/ols_l2_error_chart.png)
 
-The `--select_layer` flag scans all stored layers, runs the three pure conditions at each, and reports norm spread, condition number, and mean L2 error to identify the best layer automatically.
-
-### Results — arithmetic (layer 1)
-
-Pure-task conditions are recovered near-perfectly. Mixed ratios are directionally correct with larger errors in equal-mix conditions.
-
-| Ratio | True weights (H, L, ML) | Inferred α (H, L, ML) | L2 error |
-|---|---|---|---|
-| 3-0-0 | 1, 0, 0 | 1.000, 0, 0 | 0.001 |
-| 0-3-0 | 0, 1, 0 | 0.001, 0.997, 0.004 | 0.005 |
-| 0-0-3 | 0, 0, 1 | -0.019, -0.010, 1.029 | 0.036 |
-| 2-1-0 | 0.67, 0.33, 0 | 0.565, 0.388, 0.047 | 0.125 |
-| 1-2-0 | 0.33, 0.67, 0 | 0.239, 0.739, 0.022 | 0.121 |
-| 0-2-1 | 0, 0.67, 0.33 | -0.001, 0.677, 0.324 | 0.014 |
-| 0-1-2 | 0, 0.33, 0.67 | -0.030, 0.326, 0.704 | 0.049 |
-| 2-0-1 | 0.67, 0, 0.33 | 0.604, -0.010, 0.406 | 0.096 |
-| 1-0-2 | 0.33, 0, 0.67 | 0.258, -0.012, 0.754 | 0.116 |
-| 1-1-1 | all=0.33 | 0.263, 0.383, 0.354 | 0.087 |
-
-### Results — MMLU semantic domains (layer 10)
-
-Despite all three domains sharing the same A/B/C/D output format, the decomposition recovers mixture coefficients with low error — including the equal 1-1-1 mix.
-
-| Ratio | True weights (H, L, ML) | Inferred α (H, L, ML) | L2 error |
-|---|---|---|---|
-| 3-0-0 | 1, 0, 0 | 0.959, 0.042, -0.001 | 0.059 |
-| 0-3-0 | 0, 1, 0 | -0.015, 1.020, -0.005 | 0.026 |
-| 0-0-3 | 0, 0, 1 | 0.020, 0.009, 0.971 | 0.037 |
-| 2-1-0 | 0.67, 0.33, 0 | 0.664, 0.341, -0.005 | 0.010 |
-| 1-2-0 | 0.33, 0.67, 0 | 0.330, 0.664, 0.006 | 0.007 |
-| 0-2-1 | 0, 0.67, 0.33 | 0.037, 0.690, 0.273 | 0.074 |
-| 0-1-2 | 0, 0.33, 0.67 | 0.041, 0.330, 0.629 | 0.056 |
-| 2-0-1 | 0.67, 0, 0.33 | 0.670, 0.020, 0.350 | 0.026 |
-| 1-0-2 | 0.33, 0, 0.67 | 0.356, 0.037, 0.681 | 0.0453 |
-| 1-1-1 | all=0.33 | 0.365, 0.315, 0.320 | 0.039 |
-
-MMLU decomposition is notably cleaner than arithmetic for equal-mix conditions, because the shared format means contrast vectors are closer in direction and the mixing geometry is more symmetric.
-
-### Usage
-
-```bash
-# Find optimal layer automatically
-python experiments/task_vector_injection/decompose_task_mixture.py --select_layer
-python experiments/task_vector_injection/decompose_task_mixture.py --experiment mmlu --select_layer
-
-# Sweep all 10 simplex ratios at the best layer
-python experiments/task_vector_injection/decompose_task_mixture.py --layer 1 --sweep
-python experiments/task_vector_injection/decompose_task_mixture.py --experiment mmlu --layer 10 --sweep
-
-# Probe a specific ratio
-python experiments/task_vector_injection/decompose_task_mixture.py --ratio 2 1 0
-```
+Recovery is strong across all groups; MMLU is the most accurate and uniform, while Entity shows larger deviations on mixed ratios (semantic heterogeneity under a bare-country prompt mixes less cleanly than shared-format tasks). A noise-centroid permutation baseline confirms recovery is driven by task-specific geometry, not the shared component. Full per-ratio coefficient tables with 95% bootstrap CIs are in the paper appendix.
 
 ---
 
-## Background
+## Result 3 — Causality: injecting the convex combination steers behavior
 
-Early exploratory work (archived) tested the same superposition hypothesis on medical specialty tasks (Medicine / Surgery / Pharmacology from MedMCQA) and format-distinct clinical tasks (MCQ / PubMedQA / Symptom2Disease). Those experiments established the initial observation of linear superposition and identified that optimal layer depth differs by task type (early layers for format differences, middle layers for semantic differences). The arithmetic and MMLU experiments were designed with tighter experimental controls and the quantitative κ framework.
+Geometry alone is correlational. We test whether the convex combination is **causally sufficient**: reconstruct `v_inj(r) = Σ wₖ·ĉₖ` from pure-task vectors, add `α·v_inj(r)` to the residual stream of an otherwise task-free prompt, and measure whether the first-token distribution shifts toward the ratio-*r* ICL distribution (Jensen–Shannon confusion matrix, **double-centered** to remove row/column main effects; a genuine match is a *negative* diagonal). Significance is an exact-logic permutation test over ratio relabelings (10,000 draws, add-one corrected). The injection layer and α are fixed on the **pure ratios only** — never on the mixed-ratio outcomes under test.
+
+**Injection results (mean double-centered JS diagonal, 95% CI; more negative = stronger task-matching):**
+
+| Group | Format | Llama-3.2-3B (*l*=18) | perm-*p* | Qwen-2.5-3B (*l*=27) | perm-*p* |
+|---|---|---|---|---|---|
+| Entity | — | −0.0232 [−0.0300, −0.0170] | 0.0001 | −0.0012 [−0.0014, −0.0009] | 0.0001 |
+| Arithmetic | Direct | −0.0251 [−0.0283, −0.0224] | 0.0001 | −0.0196 [−0.0247, −0.0146] | 0.0001 |
+| Arithmetic | MCQ | −0.0449 [−0.0467, −0.0431] | 0.0001 | −0.0170 [−0.0243, −0.0102] | 0.0001 |
+| Arithmetic | Verification | −0.0753 [−0.0783, −0.0724] | 0.0001 | −0.0091 [−0.0107, −0.0079] | 0.0001 |
+
+Every condition is significant at *p* = 0.0001 in **both** model families. Qwen's magnitudes are smaller because its first-token distributions occupy a more compressed JS range, so each model is compared against its own null, not across models by raw magnitude. α = 4 throughout, except Qwen Direct (α = 6). Increasing α past its optimum *degrades* task-matching — a signature of genuine steering rather than a monotone artifact.
+
+**Injection depth ≠ OLS decomposition layer.** OLS recovery is most accurate at a *shallow* layer (arithmetic *l*=3), but injecting there is causally inert — the geometry is readable early but not yet wired into the output computation:
+
+| Format | Injection at OLS layer *l*=3 | *p* |
+|---|---|---|
+| Direct | −0.0030 [−0.0036, −0.0023] | 0.0001 |
+| MCQ | +0.0008 [+0.0006, +0.0010] | 1.0000 |
+| Verification | +0.0003 [+0.0002, +0.0004] | 1.0000 |
+
+At *l*=3 the effect is an order of magnitude smaller (Direct) or non-significant (MCQ, Verification); at *l*=18 every format is decisively significant (table above). **OLS recovery accuracy does not necessarily correlate with injection efficacy** — the two criteria probe different (static-geometric vs. causal) properties.
 
 ---
 
@@ -184,21 +161,29 @@ Early exploratory work (archived) tested the same superposition hypothesis on me
 
 ```
 .
-├── local_model.py              # model loading; set TASK_VECTOR_MODEL / TASK_VECTOR_QUANTIZE env vars
+├── local_model.py                  # model loading; set TASK_VECTOR_MODEL / TASK_VECTOR_QUANTIZE env vars
 ├── requirements.txt
 ├── data/
-│   ├── data_arithmetic_formats.py   # Direct / MCQ / Verification task pools
-│   └── data_semantic_domains.py     # History / Law / ML MMLU pools
+│   ├── data_arithmetic_formats.py      # Direct / MCQ / Verification pools
+│   ├── data_entity_attribute.py        # Capital / Currency / Language (country-attribute) pools
+│   └── data_semantic_domains.py        # History / Law / ML MMLU pools
 ├── experiments/
-│   ├── sweep_arithmetic.py          # ratio + layer sweep, arithmetic tasks
-│   ├── sweep_mmlu.py                # ratio + layer sweep, MMLU semantic domains
-│   ├── plot_kappa_comparison.py     # cross-model κ comparison plot
+│   ├── sweep_arithmetic.py             # ratio + layer sweep, arithmetic (κ + permutation null)
+│   ├── sweep_entity.py                 # ratio + layer sweep, entity attribution
+│   ├── sweep_mmlu.py                   # ratio + layer sweep, MMLU semantic domains
+│   ├── kappa_null.py                   # exact 720-permutation null for κ
+│   ├── plot_kappa_comparison.py        # cross-model κ comparison plots
 │   └── task_vector_injection/
-│       ├── extract_vectors.py           # contrast vector extraction, MMLU
-│       ├── extract_arithmetic_vectors.py # contrast vector extraction, arithmetic
-│       └── decompose_task_mixture.py    # inverse superposition via reparametrised OLS
-├── results/                         # output figures and κ JSON files
-└── archive/                         # earlier exploratory experiments
+│       ├── extract_arithmetic.py           # pure-task contrast-vector extraction, arithmetic
+│       ├── extract_entity.py               # pure-task contrast-vector extraction, entity
+│       ├── extract_vectors.py              # pure-task contrast-vector extraction, MMLU
+│       ├── decompose_task_mixture.py       # inverse superposition (reparameterized OLS)
+│       ├── inject_arithmetic_js.py         # causal injection + JS confusion test, arithmetic
+│       ├── inject_entity_js.py             # causal injection + JS confusion test, entity
+│       └── inject_entity_behavioral.py     # behavioral (answer-distribution) injection check
+├── results/                            # output figures + κ JSON (κ values, permutation null)
+├── ratio_centroids/                    # cached mixed-ratio centroids (for downstream metrics)
+└── archive/                            # earlier exploratory experiments
 ```
 
 ---
@@ -206,20 +191,32 @@ Early exploratory work (archived) tested the same superposition hypothesis on me
 ## Usage
 
 ```bash
-# Arithmetic experiment — default 3B, float16
-python experiments/sweep_arithmetic.py
+# --- κ layer/ratio sweeps (writes results/<group>_kappa_<model>.json + figures) ---
+python experiments/sweep_arithmetic.py                                             # default Llama-3.2-3B, fp16
 python experiments/sweep_arithmetic.py --model meta-llama/Llama-3.2-1B-Instruct
 python experiments/sweep_arithmetic.py --model meta-llama/Llama-3.1-8B-Instruct --quantize int8
+python experiments/sweep_entity.py     --model google/gemma-2-2b-it
+python experiments/sweep_mmlu.py       --model Qwen/Qwen2.5-3B-Instruct
 
-# MMLU experiment
-python experiments/sweep_mmlu.py
-python experiments/sweep_mmlu.py --model meta-llama/Llama-3.2-1B-Instruct
-
-# Cross-model κ comparison (reads from results/)
-# → saves results/arithmetic_kappa_comparison_across_models.png
-python experiments/plot_kappa_comparison.py
-# → saves results/mmlu_kappa_comparison_across_models.png
+# --- cross-model κ comparison plots (reads results/) ---
+python experiments/plot_kappa_comparison.py                          # → arithmetic_kappa_comparison_across_models.png
+python experiments/plot_kappa_comparison.py --glob "entity_kappa_*.json"
 python experiments/plot_kappa_comparison.py --glob "mmlu_kappa_*.json"
+
+# --- OLS mixture recovery ---
+python experiments/task_vector_injection/decompose_task_mixture.py --select_layer          # find best layer on pure ratios
+python experiments/task_vector_injection/decompose_task_mixture.py --layer 3 --sweep --ci   # all 10 ratios + bootstrap CIs
+python experiments/task_vector_injection/decompose_task_mixture.py --experiment mmlu --layer 18 --sweep --noise
+
+# --- causal injection (JS confusion + double-centered permutation test) ---
+python experiments/task_vector_injection/inject_arithmetic_js.py --layers 18 --alphas 4 --all_ratios
+python experiments/task_vector_injection/inject_entity_js.py     --layer 18 --alphas 4 --all_ratios
 ```
 
-Outputs (PNG figures and κ JSON files) are saved to `results/` automatically.
+Set the model with `--model` or the `TASK_VECTOR_MODEL` environment variable. Outputs (PNG figures and κ JSON) are written to `results/`.
+
+---
+
+## Background
+
+Early exploratory work (archived) tested the same superposition hypothesis on medical-specialty tasks (Medicine / Surgery / Pharmacology from MedMCQA) and format-distinct clinical tasks (MCQ / PubMedQA / Symptom2Disease). Those runs established the initial observation of linear superposition and that optimal layer depth differs by task type (early for format, middle for semantics). The arithmetic, entity, and MMLU experiments here add tighter controls, the quantitative κ framework with an exact null, and the causal injection test.

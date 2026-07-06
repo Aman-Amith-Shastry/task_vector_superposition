@@ -1,0 +1,88 @@
+Model device: mps:0
+Experiment : entity  |  Tasks: ['Capital', 'Currency', 'Language']
+
+Loading data pools...
+Layer      : 18  |  n_samples: 50
+Loading stored centroids at layer 18...
+
+Ratio 3-0-0  (Capital=1.00, Currency=0.00, Language=0.00)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Capital        α=+1.007  (true 1.00)  95% CI [+0.997, +1.017]
+    Currency       α=-0.000  (true 0.00)  95% CI [-0.010, +0.010]
+    Language       α=-0.007  (true 0.00)  95% CI [-0.014, +0.000]
+    L2 error: 0.0099
+
+Ratio 0-3-0  (Capital=0.00, Currency=1.00, Language=0.00)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Capital        α=+0.003  (true 0.00)  95% CI [-0.006, +0.012]
+    Currency       α=+0.995  (true 1.00)  95% CI [+0.982, +1.007]
+    Language       α=+0.002  (true 0.00)  95% CI [-0.005, +0.010]
+    L2 error: 0.0057
+
+Ratio 0-0-3  (Capital=0.00, Currency=0.00, Language=1.00)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Capital        α=+0.016  (true 0.00)  95% CI [-0.007, +0.039]
+    Currency       α=-0.001  (true 0.00)  95% CI [-0.016, +0.014]
+    Language       α=+0.985  (true 1.00)  95% CI [+0.947, +1.021]
+    L2 error: 0.0217
+
+Ratio 2-1-0  (Capital=0.67, Currency=0.33, Language=0.00)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Capital        α=+0.739  (true 0.67)  95% CI [+0.688, +0.786]
+    Currency       α=+0.200  (true 0.33)  95% CI [+0.159, +0.246]
+    Language       α=+0.061  (true 0.00)  95% CI [+0.050, +0.073]
+    L2 error: 0.1629
+
+Ratio 1-2-0  (Capital=0.33, Currency=0.67, Language=0.00)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Capital        α=+0.188  (true 0.33)  95% CI [+0.129, +0.251]
+    Currency       α=+0.768  (true 0.67)  95% CI [+0.698, +0.836]
+    Language       α=+0.044  (true 0.00)  95% CI [+0.031, +0.056]
+    L2 error: 0.1824
+
+Ratio 0-2-1  (Capital=0.00, Currency=0.67, Language=0.33)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Capital        α=+0.001  (true 0.00)  95% CI [-0.010, +0.012]
+    Currency       α=+0.911  (true 0.67)  95% CI [+0.882, +0.936]
+    Language       α=+0.088  (true 0.33)  95% CI [+0.067, +0.111]
+    L2 error: 0.3466
+
+Ratio 0-1-2  (Capital=0.00, Currency=0.33, Language=0.67)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Capital        α=+0.026  (true 0.00)  95% CI [+0.009, +0.043]
+    Currency       α=+0.462  (true 0.33)  95% CI [+0.395, +0.522]
+    Language       α=+0.512  (true 0.67)  95% CI [+0.446, +0.584]
+    L2 error: 0.2024
+
+Ratio 2-0-1  (Capital=0.67, Currency=0.00, Language=0.33)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Capital        α=+0.829  (true 0.67)  95% CI [+0.790, +0.866]
+    Currency       α=+0.031  (true 0.00)  95% CI [+0.018, +0.044]
+    Language       α=+0.139  (true 0.33)  95% CI [+0.104, +0.179]
+    L2 error: 0.2551
+
+Ratio 1-0-2  (Capital=0.33, Currency=0.00, Language=0.67)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Capital        α=+0.380  (true 0.33)  95% CI [+0.309, +0.449]
+    Currency       α=+0.056  (true 0.00)  95% CI [+0.036, +0.077]
+    Language       α=+0.565  (true 0.67)  95% CI [+0.494, +0.647]
+    L2 error: 0.1251
+
+Ratio 1-1-1  (Capital=0.33, Currency=0.33, Language=0.33)
+  Extracting probe at layer 18 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Capital        α=+0.368  (true 0.33)  95% CI [+0.311, +0.431]
+    Currency       α=+0.400  (true 0.33)  95% CI [+0.348, +0.454]
+    Language       α=+0.231  (true 0.33)  95% CI [+0.199, +0.266]
+    L2 error: 0.1268
+
+Done.

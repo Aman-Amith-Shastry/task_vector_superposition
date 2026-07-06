@@ -13,6 +13,8 @@ identical across conditions — analogous to the "=" hook in Hendel et al.
 Content is generated programmatically; no HuggingFace dataset required.
 """
 
+from __future__ import annotations
+
 import random
 
 TASKS            = ["Direct", "MCQ", "Verification"]
@@ -43,9 +45,23 @@ _LETTERS = ["A", "B", "C", "D"]
 # Internal generation helpers
 # --------------------------------------------------------------------------
 
-def _gen_base(n: int, seed: int) -> list[dict]:
-    rng = random.Random(seed)
-    return [{"op1": rng.randint(1, 49), "op2": rng.randint(1, 49)} for _ in range(n)]
+def _gen_base(n: int, seed: int, exclude: set | None = None) -> list[dict]:
+    """n unique (op1, op2) pairs from [1,49]^2, skipping any pair in `exclude`.
+
+    Uniqueness (within the pool) and the exclude set let load_pools build an ICL
+    pool and a test pool that are internally duplicate-free and disjoint from each
+    other, so a test op-pair can never appear among the in-context examples —
+    preventing the model from copying a demonstrated answer instead of computing it.
+    """
+    rng  = random.Random(seed)
+    seen = set(exclude) if exclude else set()
+    out: list[dict] = []
+    while len(out) < n:
+        pair = (rng.randint(1, 49), rng.randint(1, 49))
+        if pair not in seen:
+            seen.add(pair)
+            out.append({"op1": pair[0], "op2": pair[1]})
+    return out
 
 
 def _mcq_options(answer: int, rng: random.Random) -> tuple[list[int], int]:
@@ -93,7 +109,10 @@ def _as_verification(base: dict, seed: int) -> dict:
 def load_pools() -> dict[str, dict]:
     """Generate ICL and test pools for all three format tasks."""
     base_icl  = _gen_base(N_ICL_POOL, SEED)
-    base_test = _gen_base(N_TEST_POOL, SEED + 1)
+    # Exclude every ICL op-pair from the test pool so the two are disjoint:
+    # a test addition is never demonstrated in-context (no answer copying).
+    icl_pairs = {(b["op1"], b["op2"]) for b in base_icl}
+    base_test = _gen_base(N_TEST_POOL, SEED + 1, exclude=icl_pairs)
 
     pools: dict[str, dict] = {}
     for i, task in enumerate(TASKS):
@@ -152,22 +171,28 @@ def build_messages(
     counts: tuple[int, int, int],
     sample_idx: int = 0,
     rotate_test: bool = False,
+    test_task: str | None = None,
 ) -> list[dict]:
     """ICL messages for the given per-task counts + a held-out test question.
 
-    By default, pure conditions use a matching test question format and mixed
-    conditions rotate with sample_idx.  Set rotate_test=True to rotate for
-    all conditions uniformly, so the test question contributes equally to every
-    centroid and the contrast vector purely reflects the ICL composition.
+    If test_task is provided, the held-out question uses that arithmetic format
+    explicitly. Otherwise, pure conditions use a matching test question format
+    and mixed conditions rotate with sample_idx. Set rotate_test=True to rotate
+    for all conditions uniformly, so the test question contributes equally to
+    every centroid and the contrast vector purely reflects the ICL composition.
     """
     is_pure   = counts in PURE_RATIOS
-    if rotate_test:
-        test_task = TASKS[sample_idx % len(TASKS)]
+    if test_task is not None:
+        if test_task not in TASKS:
+            raise ValueError(f"Unknown arithmetic test_task {test_task!r}; expected one of {TASKS}")
+        selected_test_task = test_task
+    elif rotate_test:
+        selected_test_task = TASKS[sample_idx % len(TASKS)]
     else:
-        test_task = TASKS[counts.index(max(counts))] if is_pure else TASKS[sample_idx % len(TASKS)]
+        selected_test_task = TASKS[counts.index(max(counts))] if is_pure else TASKS[sample_idx % len(TASKS)]
 
-    test_ex    = rng.choice(pools[test_task]["test"])
-    test_input = format_test_input(test_task, test_ex)
+    test_ex    = rng.choice(pools[selected_test_task]["test"])
+    test_input = format_test_input(selected_test_task, test_ex)
 
     all_examples: list[tuple[str, str]] = []
     for task, n in zip(TASKS, counts):

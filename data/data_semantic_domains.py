@@ -52,6 +52,9 @@ def load_pools() -> dict[str, dict]:
         all_ex = list(
             load_dataset("cais/mmlu", subject, split="test").shuffle(seed=SEED)
         )
+        # ICL and test draw from non-overlapping slices of the same shuffled list,
+        # so the two pools are disjoint by construction — a test question is never
+        # shown as an in-context example.
         n_icl   = min(N_ICL_POOL, len(all_ex) - N_VECTOR_SAMPLES)
         icl_ex  = all_ex[:n_icl]
         test_ex = all_ex[n_icl: n_icl + N_VECTOR_SAMPLES]

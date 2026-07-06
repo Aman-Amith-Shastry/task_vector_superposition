@@ -1,0 +1,23 @@
+Model device: mps:0
+Experiment : entity  |  Tasks: ['Capital', 'Currency', 'Language']
+
+Loading data pools...
+
+Scanning 8 stored layers: [2, 4, 7, 11, 14, 18, 23, 27]
+Running pure conditions (50 samples each)...
+
+ Layer   Norm spread    Cond #   Mean L2 (pure)
+──────────────────────────────────────────────────
+     2        0.0536      3.35           0.1552
+     4        0.0567      2.56           0.1538
+     7        0.1733      2.48           0.0925
+    11        1.3571      2.36           0.0736
+    14        1.4915      2.39           0.0904
+    18        2.0081      2.26           0.0413
+    23        3.7831      1.85           0.0357
+    27       10.1088      1.69           0.0256
+──────────────────────────────────────────────────
+
+Best layer: 27  (mean pure-condition L2 = 0.0256)
+
+Done.

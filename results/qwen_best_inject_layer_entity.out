@@ -1,0 +1,26 @@
+Model device: mps:0
+JS injection test | 3 pure tasks | layers [2, 4, 7, 11, 14, 18, 23, 27] | alphas [4.0] | n_icl=4 | n_bootstrap=1000 | n_perm=10000
+Test countries: 30
+
+layer  2, alpha  4.0: mean centered diag = +0.0000 [-0.0000, +0.0001]  row-min 1/3  boot-sig: no  perm-p: 0.7079  (trace obs 47.491 vs null 47.489)
+layer  4, alpha  4.0: mean centered diag = +0.0007 [-0.0001, +0.0018]  row-min 0/3  boot-sig: no  perm-p: 0.9383  (trace obs 47.606 vs null 47.546)
+layer  7, alpha  4.0: mean centered diag = +0.0017 [-0.0011, +0.0051]  row-min 0/3  boot-sig: no  perm-p: 0.7984  (trace obs 50.309 vs null 50.160)
+layer 11, alpha  4.0: mean centered diag = -0.0017 [-0.0053, +0.0015]  row-min 2/3  boot-sig: no  perm-p: 0.1799  (trace obs 47.578 vs null 47.730)
+layer 14, alpha  4.0: mean centered diag = +0.0008 [-0.0044, +0.0059]  row-min 0/3  boot-sig: no  perm-p: 0.5675  (trace obs 48.690 vs null 48.623)
+layer 18, alpha  4.0: mean centered diag = -0.0208 [-0.0405, +0.0019]  row-min 2/3  boot-sig: no  perm-p: 0.0073  (trace obs 50.346 vs null 52.219)
+layer 23, alpha  4.0: mean centered diag = +0.0120 [-0.0099, +0.0303]  row-min 0/3  boot-sig: no  perm-p: 0.9340  (trace obs 58.472 vs null 57.381)
+layer 27, alpha  4.0: mean centered diag = -0.0024 [-0.0030, -0.0018]  row-min 3/3  boot-sig: YES  perm-p: 0.0001  (trace obs 62.006 vs null 62.221)
+
+=== Task-matching vs depth ===
+  bootstrap meanDiag (effect size, more negative = stronger) | permutation p (significance)
+ layer  alpha   meanDiag                 95% CI  row-min   perm-p
+     2    4.0    +0.0000  [-0.0000, +0.0001]       1/3  0.7079 
+     4    4.0    +0.0007  [-0.0001, +0.0018]       0/3  0.9383 
+     7    4.0    +0.0017  [-0.0011, +0.0051]       0/3  0.7984 
+    11    4.0    -0.0017  [-0.0053, +0.0015]       2/3  0.1799 
+    14    4.0    +0.0008  [-0.0044, +0.0059]       0/3  0.5675 
+    18    4.0    -0.0208  [-0.0405, +0.0019]       2/3  0.0073*
+    23    4.0    +0.0120  [-0.0099, +0.0303]       0/3  0.9340 
+    27    4.0    -0.0024  [-0.0030, -0.0018]       3/3  0.0001*
+
+Permutation p < 0.05 (*): injecting the (weighted-sum) vector for ratio r reproduces real ratio-r ICL behavior better than chance relabeling. Bootstrap meanDiag/CI gives the effect size.

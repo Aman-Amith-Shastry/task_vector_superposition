@@ -1,0 +1,36 @@
+Model device: mps:0
+JS injection test | all 10 ratios | test_task=MCQ | layers [3] | alphas [4.0] | n_icl=4 | n_bootstrap=1000 | n_perm=10000
+Test examples (MCQ format): 50
+
+Ceiling diagnostic: JS among real P_ICL(r) distributions (no injection)
+
+  Mean JS(P_ICL(r) || P_ICL(r'))  [0 = identical behavior]:
+         3-0-0     0-3-0     0-0-3     2-1-0     1-2-0     0-2-1     0-1-2     2-0-1     1-0-2     1-1-1
+     3-0-0    0.0000    0.5878    0.1303    0.4274    0.5150    0.5481    0.4579    0.1179    0.1692    0.4611
+     0-3-0    0.5878    0.0000    0.5450    0.1029    0.0649    0.0147    0.0677    0.5449    0.4979    0.0771
+     0-0-3    0.1303    0.5450    0.0000    0.3875    0.4872    0.5052    0.3985    0.0173    0.0247    0.4146
+     2-1-0    0.4274    0.1029    0.3875    0.0000    0.0460    0.0671    0.0426    0.3573    0.3115    0.0192
+     1-2-0    0.5150    0.0649    0.4872    0.0460    0.0000    0.0414    0.0470    0.4601    0.4168    0.0351
+     0-2-1    0.5481    0.0147    0.5052    0.0671    0.0414    0.0000    0.0376    0.4978    0.4499    0.0439
+     0-1-2    0.4579    0.0677    0.3985    0.0426    0.0470    0.0376    0.0000    0.3842    0.3365    0.0215
+     2-0-1    0.1179    0.5449    0.0173    0.3573    0.4601    0.4978    0.3842    0.0000    0.0154    0.3882
+     1-0-2    0.1692    0.4979    0.0247    0.3115    0.4168    0.4499    0.3365    0.0154    0.0000    0.3420
+     1-1-1    0.4611    0.0771    0.4146    0.0192    0.0351    0.0439    0.0215    0.3882    0.3420    0.0000
+
+  Most similar ratio pairs (smallest JS):
+    0-3-0 ~ 0-2-1:  JS=0.0147  (simplex dist 0.47)
+    2-0-1 ~ 1-0-2:  JS=0.0154  (simplex dist 0.47)
+    0-0-3 ~ 2-0-1:  JS=0.0173  (simplex dist 0.94)
+    2-1-0 ~ 1-1-1:  JS=0.0192  (simplex dist 0.47)
+    0-1-2 ~ 1-1-1:  JS=0.0215  (simplex dist 0.47)
+  Most distinct ratio pairs (largest JS):
+    3-0-0 vs 1-2-0:  JS=0.5150  (simplex dist 0.94)
+    0-3-0 vs 2-0-1:  JS=0.5449  (simplex dist 1.25)
+    0-3-0 vs 0-0-3:  JS=0.5450  (simplex dist 1.41)
+    3-0-0 vs 0-2-1:  JS=0.5481  (simplex dist 1.25)
+    3-0-0 vs 0-3-0:  JS=0.5878  (simplex dist 1.41)
+
+  Off-diagonal JS range: [0.0147, 0.5878]  mean 0.2650
+  Corr(JS, simplex distance) = +0.538
+
+  High corr + a real JS range => behavioral distinguishability tracks composition (real ceiling to reproduce). Uniformly tiny JS => low ceiling: the model barely differentiates ratios behaviorally, so no alpha will help.

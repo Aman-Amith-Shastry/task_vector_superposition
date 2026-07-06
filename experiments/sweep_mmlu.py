@@ -12,7 +12,7 @@ comparable across model sizes.
 Usage:
     python experiments/sweep_mmlu.py
     python experiments/sweep_mmlu.py --model meta-llama/Llama-3.2-1B-Instruct
-    python experiments/sweep_mmlu.py --model meta-llama/Llama-3.1-8B-Instruct
+    python experiments/sweep_mmlu.py --model meta-llama/Llama-3.1-8B-Instruct --quantize int8
 """
 
 import json
@@ -20,6 +20,7 @@ import sys, os
 _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _root)
 sys.path.insert(0, os.path.join(_root, "data"))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # experiments/ (kappa_null)
 
 # Parse --model BEFORE importing local_model (model loads at import time)
 import argparse as _ap
@@ -28,13 +29,23 @@ _mp.add_argument("--model", default="meta-llama/Llama-3.2-3B-Instruct",
                  help="HuggingFace model ID to use.")
 _mp.add_argument("--quantize", default="", choices=["", "int8", "int4"],
                  help="Quantize weights via quanto (recommended for 8B on MPS).")
+_mp.add_argument("--null-check", action="store_true",
+                 help="Also compute the exact 720-permutation null for κ (per layer).")
 _margs, _ = _mp.parse_known_args()
 os.environ["TASK_VECTOR_MODEL"]    = _margs.model
 os.environ["TASK_VECTOR_QUANTIZE"] = _margs.quantize
 
 import re
-_size_match = re.search(r'(\d+\.?\d*[Bb])', _margs.model)
-MODEL_TAG = _size_match.group(1).upper() if _size_match else _margs.model.split("/")[-1]
+def _make_model_tag(model_id: str) -> str:
+    size = (re.search(r'(\d+\.?\d*[Bb])', model_id) or type("", (), {"group": lambda s, n: model_id.split("/")[-1]})()).group(1).upper()
+    name = model_id.lower()
+    if "qwen"    in name: return f"Qwen-{size}"
+    if "llama"   in name: return f"Llama-{size}"
+    if "mistral" in name: return f"Mistral-{size}"
+    if "gemma"   in name: return f"Gemma-{size}"
+    return model_id.split("/")[-1]
+MODEL_TAG  = _make_model_tag(_margs.model)
+NULL_CHECK = _margs.null_check
 
 import random
 import numpy as np
@@ -43,6 +54,7 @@ import matplotlib.pyplot as plt
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 from local_model import get_activations_all_layers, n_layers
+from kappa_null import kappa_permutation_null
 from data_semantic_domains import (
     TASKS, RATIOS, PURE_RATIOS, N_VECTOR_SAMPLES, load_pools, build_messages,
     _format_question,
@@ -136,6 +148,12 @@ def plot_layer_grid(results: dict, layers: list[int]) -> None:
 
     # kappa_data[layer] = list of valid κ values across mixed ratios
     kappa_data: dict[str, list[float]] = {}
+    # kappa_null_data[layer] = exact permutation-null summary (only if NULL_CHECK)
+    kappa_null_data: dict[str, dict] = {}
+    # ratio_centroids_out["{layer}|{ratio}"] = original-space actual centroid μ_r^l
+    # for all 10 ratios; persisted (see below) so ρ / κ / cosine can be recomputed
+    # offline without re-running the model.
+    ratio_centroids_out: dict[str, np.ndarray] = {}
 
     for ax_idx, layer in enumerate(layers):
         ax = axes[ax_idx]
@@ -172,10 +190,24 @@ def plot_layer_grid(results: dict, layers: list[int]) -> None:
                 ax.annotate(task_name, centroid,
                             textcoords="offset points", xytext=(5, 4), fontsize=7)
 
-        # Triangle centre — geometric mean of pure centroids
+        # Triangle centre — geometric mean of pure centroids (2-D, for plotting only)
         tri_center = np.mean([pure_centroids[p] for p in PURE_RATIOS], axis=0)
 
+        # --- Original-space quantities for κ (LDA used only for scatter plots) ---
+        # d_predicted lies in the span of the pure centroids (the LDA plane), so
+        # projecting to 2-D loses no information about the predicted direction.
+        # However d_actual may drift orthogonal to that plane; computing κ in the
+        # original space catches those deviations, making it the stronger test.
+        orig_centroids_map = {r: results[r][layer].mean(axis=0) for r in RATIOS}
+        for _r, _c in orig_centroids_map.items():
+            ratio_centroids_out[f"{layer}|{'-'.join(map(str, _r))}"] = _c.astype(np.float32)
+        pure_orig       = {p: orig_centroids_map[p] for p in PURE_RATIOS}
+        tri_center_orig = np.mean(list(pure_orig.values()), axis=0)
+        tri_scale_orig  = np.mean([np.linalg.norm(pure_orig[p] - tri_center_orig)
+                                    for p in PURE_RATIOS])
+
         layer_kappas = []
+        layer_pairs  = []   # (d_act, d_pred) for mixed ratios with valid prediction
         for ratio in RATIOS:
             if ratio in PURE_RATIOS:
                 continue
@@ -189,19 +221,20 @@ def plot_layer_grid(results: dict, layers: list[int]) -> None:
                 for n, p in zip(ratio, PURE_RATIOS)
             )
 
-            # κ: scalar projection of actual displacement onto predicted direction,
-            # normalised so κ=1 means perfect linear combination, κ=0 means no mixing.
-            d_actual    = centroid  - tri_center
-            d_predicted = predicted - tri_center
-            denom       = np.dot(d_predicted, d_predicted)
-            tri_scale   = np.mean([np.linalg.norm(pure_centroids[p] - tri_center)
-                                   for p in PURE_RATIOS])
-            kappa_str   = "—"
-            if np.sqrt(denom) > 0.05 * tri_scale:
-                kappa     = float(np.dot(d_actual, d_predicted) / denom)
+            # κ computed in the original contrast-vector space (not LDA 2-D).
+            # Undefined (shown as "—") when predicted ≈ triangle centre (e.g. 1-1-1).
+            orig_c    = orig_centroids_map[ratio]
+            orig_p    = sum((n / total) * pure_orig[p] for n, p in zip(ratio, PURE_RATIOS))
+            d_act_o   = orig_c - tri_center_orig
+            d_pred_o  = orig_p - tri_center_orig
+            denom     = np.dot(d_pred_o, d_pred_o)
+            kappa_str = "—"
+            if np.sqrt(denom) > 0.05 * tri_scale_orig:
+                kappa     = float(np.dot(d_act_o, d_pred_o) / denom)
                 kappa_str = f"{kappa:.2f}"
                 layer_kappas.append(kappa)
-            dist = np.linalg.norm(centroid - predicted)
+                layer_pairs.append((d_act_o, d_pred_o))
+            dist = np.linalg.norm(centroid - predicted)   # 2-D visual distance for annotation
 
             ax.scatter(*centroid,  color=color, s=70,
                        edgecolors="black", linewidths=0.6, zorder=5)
@@ -218,6 +251,14 @@ def plot_layer_grid(results: dict, layers: list[int]) -> None:
                         fontsize=6, color="dimgray")
 
         kappa_data[str(layer)] = layer_kappas
+
+        if NULL_CHECK and len(layer_pairs) >= 2:
+            null = kappa_permutation_null(layer_pairs)
+            kappa_null_data[str(layer)] = null
+            print(f"    layer {layer}: mean κ = {null['S_obs']:.3f}  "
+                  f"exact perm-p = {null['p_value']:.4g}  "
+                  f"(null mean {null['null_mean']:.3f}, n_perm {null['n_perm']})")
+
         ax.set_title(f"Layer {layer}", fontsize=10)
         ax.set_xlabel("LDA 1", fontsize=8)
         ax.set_ylabel("LDA 2", fontsize=8)
@@ -261,11 +302,21 @@ def plot_layer_grid(results: dict, layers: list[int]) -> None:
                 "model": _margs.model,
                 "n_layers": n_layers,
                 "kappa": kappa_data,  # {layer_str: [kappa, ...]}
+                "kappa_null": kappa_null_data,  # {layer_str: {S_obs, p_value, ...}}
             },
             f,
             indent=2,
         )
     print(f"Saved κ data → {json_out}")
+
+    # Persist the actual per-ratio centroids so ρ / κ / cosine can be recomputed
+    # offline without re-running the model. Kept out of vectors/ (which holds the
+    # pure-task injection vectors); ratio_centroids/ holds all 10 ratios per layer.
+    _rc_dir = os.path.join(_root, "ratio_centroids")
+    os.makedirs(_rc_dir, exist_ok=True)
+    _rc_out = os.path.join(_rc_dir, f"mmlu_{MODEL_TAG}.npz")
+    np.savez(_rc_out, **ratio_centroids_out)
+    print(f"Saved ratio centroids → {_rc_out}")
 
 # --------------------------------------------------------------------------
 # Entry point

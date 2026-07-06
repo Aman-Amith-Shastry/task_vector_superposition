@@ -1,0 +1,2 @@
+Direct: layer 27, alpha  6.0: mean centered diag = -0.0190 [-0.0230, -0.0149]  row-min 3/3  boot-sig: YES  perm-p: 0.0001  (trace obs 99.179 vs null 102.035)
+MCQ: layer 27, alpha  6.0: mean centered diag = -0.0117 [-0.0258, +0.0016]  row-min 2/3  boot-sig: no  perm-p: 0.0307  (trace obs 94.171 vs null 95.925)

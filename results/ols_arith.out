@@ -1,0 +1,88 @@
+Model device: mps:0
+Experiment : arithmetic  |  Tasks: ['Direct', 'Verification', 'MCQ']
+
+Loading data pools...
+Layer      : 3  |  n_samples: 50
+Loading stored centroids at layer 3...
+
+Ratio 3-0-0  (Direct=1.00, MCQ=0.00, Verification=0.00)
+  Extracting probe at layer 3 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Direct         α=+0.991  (true 1.00)  95% CI [+0.961, +1.027]
+    MCQ            α=+0.010  (true 0.00)  95% CI [-0.032, +0.049]
+    Verification   α=-0.001  (true 0.00)  95% CI [-0.015, +0.012]
+    L2 error: 0.0128
+
+Ratio 0-3-0  (Direct=0.00, MCQ=1.00, Verification=0.00)
+  Extracting probe at layer 3 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Direct         α=-0.002  (true 0.00)  95% CI [-0.018, +0.014]
+    MCQ            α=+1.002  (true 1.00)  95% CI [+0.986, +1.019]
+    Verification   α=+0.000  (true 0.00)  95% CI [-0.012, +0.013]
+    L2 error: 0.0028
+
+Ratio 0-0-3  (Direct=0.00, MCQ=0.00, Verification=1.00)
+  Extracting probe at layer 3 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Direct         α=-0.012  (true 0.00)  95% CI [-0.029, +0.005]
+    MCQ            α=+0.006  (true 0.00)  95% CI [-0.014, +0.025]
+    Verification   α=+1.005  (true 1.00)  95% CI [+0.978, +1.035]
+    L2 error: 0.0142
+
+Ratio 2-1-0  (Direct=0.67, MCQ=0.33, Verification=0.00)
+  Extracting probe at layer 3 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Direct         α=+0.576  (true 0.67)  95% CI [+0.545, +0.609]
+    MCQ            α=+0.404  (true 0.33)  95% CI [+0.364, +0.441]
+    Verification   α=+0.020  (true 0.00)  95% CI [+0.007, +0.032]
+    L2 error: 0.1173
+
+Ratio 1-2-0  (Direct=0.33, MCQ=0.67, Verification=0.00)
+  Extracting probe at layer 3 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Direct         α=+0.253  (true 0.33)  95% CI [+0.231, +0.276]
+    MCQ            α=+0.733  (true 0.67)  95% CI [+0.704, +0.760]
+    Verification   α=+0.014  (true 0.00)  95% CI [+0.000, +0.027]
+    L2 error: 0.1054
+
+Ratio 0-2-1  (Direct=0.00, MCQ=0.67, Verification=0.33)
+  Extracting probe at layer 3 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Direct         α=-0.076  (true 0.00)  95% CI [-0.092, -0.060]
+    MCQ            α=+0.659  (true 0.67)  95% CI [+0.634, +0.682]
+    Verification   α=+0.417  (true 0.33)  95% CI [+0.393, +0.445]
+    L2 error: 0.1137
+
+Ratio 0-1-2  (Direct=0.00, MCQ=0.33, Verification=0.67)
+  Extracting probe at layer 3 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Direct         α=-0.074  (true 0.00)  95% CI [-0.090, -0.058]
+    MCQ            α=+0.336  (true 0.33)  95% CI [+0.312, +0.358]
+    Verification   α=+0.739  (true 0.67)  95% CI [+0.710, +0.768]
+    L2 error: 0.1035
+
+Ratio 2-0-1  (Direct=0.67, MCQ=0.00, Verification=0.33)
+  Extracting probe at layer 3 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Direct         α=+0.571  (true 0.67)  95% CI [+0.542, +0.599]
+    MCQ            α=-0.049  (true 0.00)  95% CI [-0.079, -0.021]
+    Verification   α=+0.478  (true 0.33)  95% CI [+0.457, +0.501]
+    L2 error: 0.1805
+
+Ratio 1-0-2  (Direct=0.33, MCQ=0.00, Verification=0.67)
+  Extracting probe at layer 3 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Direct         α=+0.254  (true 0.33)  95% CI [+0.231, +0.275]
+    MCQ            α=-0.043  (true 0.00)  95% CI [-0.068, -0.018]
+    Verification   α=+0.789  (true 0.67)  95% CI [+0.760, +0.818]
+    L2 error: 0.1522
+
+Ratio 1-1-1  (Direct=0.33, MCQ=0.33, Verification=0.33)
+  Extracting probe at layer 3 (50 samples)... done
+  Bootstrap CI (1000 resamples)...
+    Direct         α=+0.202  (true 0.33)  95% CI [+0.179, +0.225]
+    MCQ            α=+0.353  (true 0.33)  95% CI [+0.328, +0.379]
+    Verification   α=+0.445  (true 0.33)  95% CI [+0.422, +0.471]
+    L2 error: 0.1740
+
+Done.

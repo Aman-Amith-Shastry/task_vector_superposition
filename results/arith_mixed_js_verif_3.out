@@ -1,0 +1,28 @@
+Model device: mps:0
+JS injection test | all 10 ratios | test_task=Verification | layers [3] | alphas [4.0] | n_icl=4 | n_bootstrap=1000 | n_perm=10000
+Test examples (Verification format): 50
+
+layer  3, alpha  4.0: mean centered diag = +0.0003 [+0.0002, +0.0004]  row-min 1/10  boot-sig: no  perm-p: 1.0000  (trace obs 175.602 vs null 175.441)
+  Raw mean JS(Q_inject(r) || P_ICL(r'))  [lower = closer; * = row min]:
+      inject \ ICL      3-0-0     0-3-0     0-0-3     2-1-0     1-2-0     0-2-1     0-1-2     2-0-1     1-0-2     1-1-1
+             3-0-0    0.3939    0.2624    0.5051    0.2310*   0.2412    0.2857    0.4648    0.3431    0.4563    0.3453 
+             0-3-0    0.3878    0.2634    0.5078    0.2274*   0.2404    0.2851    0.4686    0.3424    0.4585    0.3463 
+             0-0-3    0.3901    0.2616    0.5048    0.2259*   0.2382    0.2834    0.4672    0.3401    0.4559    0.3442 
+             2-1-0    0.3906    0.2588    0.5045    0.2252*   0.2365    0.2807    0.4641    0.3398    0.4555    0.3419 
+             1-2-0    0.3886    0.2592    0.5056    0.2240*   0.2364    0.2806    0.4655    0.3397    0.4563    0.3424 
+             0-2-1    0.3877    0.2614    0.5062    0.2250*   0.2380    0.2829    0.4677    0.3403    0.4570    0.3444 
+             0-1-2    0.3883    0.2602    0.5051    0.2239*   0.2367    0.2816    0.4669    0.3391    0.4560    0.3432 
+             2-0-1    0.3921    0.2606    0.5046    0.2274*   0.2385    0.2831    0.4651    0.3411    0.4558    0.3437 
+             1-0-2    0.3908    0.2605    0.5046    0.2259*   0.2378    0.2825    0.4660    0.3401    0.4558    0.3435 
+             1-1-1    0.3892    0.2586    0.5046    0.2234*   0.2356    0.2800    0.4652    0.3388    0.4555    0.3418 
+
+  Diagonal is row-minimum: 1/10   Diagonal CI upper bound < 0: 4/10
+
+
+=== Task-matching vs depth ===
+  bootstrap meanDiag (effect size, more negative = stronger) | permutation p (significance)
+ layer  alpha   meanDiag                 95% CI  row-min   perm-p
+     3    4.0    +0.0003  [+0.0002, +0.0004]      1/10  1.0000 
+
+Permutation p < 0.05 (*): injecting the (weighted-sum) vector for ratio r reproduces real ratio-r ICL behavior better than chance relabeling. Bootstrap meanDiag/CI gives the effect size.
+Note: with 10 ratios, adjacent ratios (e.g. 2-1-0 vs 1-2-0) are genuinely similar, so row-min/10 will be < 10 even when the effect is real — lean on the permutation p (pooled trace), which stays valid because random relabelings pair dissimilar ratios.

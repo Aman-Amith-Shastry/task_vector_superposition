@@ -32,9 +32,11 @@ _results_dir = os.path.join(_root, "results")
 
 # Model display order and line styles
 _MODEL_STYLES = {
-    "1B": dict(color="#4878CF", marker="o", linestyle="-",  label="Llama-3.2-1B"),
-    "3B": dict(color="#6ACC65", marker="s", linestyle="--", label="Llama-3.2-3B"),
-    "8B": dict(color="#D65F5F", marker="^", linestyle="-.", label="Llama-3.1-8B"),
+    "Llama-1B": dict(color="#4878CF", marker="o", linestyle="-",  label="Llama-3.2-1B"),
+    "Llama-3B": dict(color="#6ACC65", marker="s", linestyle="--", label="Llama-3.2-3B"),
+    "Llama-8B": dict(color="#D65F5F", marker="^", linestyle="-.", label="Llama-3.1-8B"),
+    "Qwen-3B":  dict(color="#E07B39", marker="D", linestyle=":",  label="Qwen-2.5-3B"),
+    "Gemma-2B": dict(color="#8E44AD", marker="v", linestyle="-.", label="Gemma-2-2B"),
 }
 
 
@@ -56,8 +58,14 @@ def load_kappa_file(path: str, clip: float) -> dict:
 
 def model_tag(model_id: str) -> str:
     import re
-    m = re.search(r'(\d+\.?\d*[Bb])', model_id)
-    return m.group(1).upper() if m else model_id.split("/")[-1]
+    m    = re.search(r'(\d+\.?\d*[Bb])', model_id)
+    size = m.group(1).upper() if m else model_id.split("/")[-1]
+    name = model_id.lower()
+    if "qwen"    in name: return f"Qwen-{size}"
+    if "llama"   in name: return f"Llama-{size}"
+    if "mistral" in name: return f"Mistral-{size}"
+    if "gemma"   in name: return f"Gemma-{size}"
+    return size
 
 
 def main():
