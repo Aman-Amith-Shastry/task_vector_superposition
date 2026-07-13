@@ -115,7 +115,7 @@ Large dots = pure-task centroids, small dots = samples, × = ratio-predicted cen
 
 **Two findings.**
 1. The residual's **magnitude** is smallest in the early layers (sinθ ≈ 0.30–0.49, at or below the floor) and substantially larger by the deepest layers (≈ 0.55–0.83) — linear superposition is geometrically **tightest early**.
-2. Whether the deeper residual is *statistically resolvable* above the floor is governed by **task separability, not depth alone**: for well-separated groups the pure-task displacements sharpen with depth, shrinking φ until the residual clears it; for entangled MMLU (three subjects sharing one A/B/C/D format) the floor stays high and the residual stays buried.
+2. Whether the deeper residual is *statistically resolvable* above the floor is governed by **task separability, not depth alone**: for well-separated groups the pure-task displacements sharpen with depth, shrinking φ until the residual clears it; for entangled MMLU (three subjects sharing one A/B/C/D format) the floor stays high, so resolvability only *approaches* the floor with depth — clearing it marginally and only at the deepest layers in the two best-separated models (Gemma-2B, Qwen-3B; R ≈ 1.05–1.09), while two of the five models stay at or below it throughout.
 
 This is about *resolving power*, not a breakdown of linearity — κ stays ≈ 1 in every case, and the convex combination remains the dominant, decodable structure at all depths.
 
@@ -127,7 +127,7 @@ Left: full-sample residual magnitude (solid) vs. its split-half floor (dashed), 
 |---|---|
 | ![orthogonal residual vs depth](results/orthogonal_residual_depth.png) | ![resolvability ratio vs depth](results/orthogonal_residual_ratio_depth_by_model.png) |
 
-The residual's magnitude grows with depth **everywhere**, but its resolvability does **not**: it peaks in the **middle layers** for the well-separated groups and decays back toward the floor by the deepest layers, while MMLU stays at or below the floor throughout.
+The residual's magnitude grows with depth **everywhere**, but its resolvability does **not**: it peaks in the **middle layers** for the well-separated groups and decays back toward the floor by the deepest layers, while MMLU only *approaches* the floor with depth — clearing it marginally at the deepest layers in two models (Gemma-2B, Qwen-3B; R ≈ 1.05–1.09) and staying at or below it throughout in the others.
 
 ### One mechanism, three regimes
 
@@ -137,9 +137,9 @@ Resolvability `R = s̃/φ` has **two levers**: it rises when the orthogonal resi
 |---|---|---|---|---|
 | **Arithmetic** | 0.38 | **+1.0** | 0.0 | **Residual-driven** — an emerging orthogonal component rises into a near-static floor |
 | **Entity** | 0.56 | +0.2 | **−1.3** | **Floor-driven** — a collapsing floor exposes an almost-flat residual as separation sharpens |
-| **MMLU** | 0.73 | +0.5 | +0.2 | **Floor-limited** — residual grows as elsewhere, but the floor never falls, so it stays buried |
+| **MMLU** | 0.73 | +0.5 | +0.2 | **Floor-limited** — residual grows as elsewhere, but the floor never falls, so R never forms a mid-network peak; it clears the floor only marginally at the deepest layers (Gemma-2B, Qwen-3B; R ≈ 1.05–1.09), staying at or below it throughout in two of five models |
 
-(ROC = rate of change per unit relative depth.) A resolvable orthogonal component thus emerges only where a **rising residual meets a falling floor** — a mid-depth phenomenon for separable geometries, and one that never surfaces for entangled ones, even though all three groups preserve their first-order linear structure equally well (κ ≈ 1).
+(ROC = rate of change per unit relative depth.) A resolvable orthogonal component thus emerges only where a **rising residual meets a falling floor** — a mid-depth phenomenon for separable geometries, and one that surfaces at most marginally — only at the deepest layers, and only in some models — for entangled ones, even though all three groups preserve their first-order linear structure equally well (κ ≈ 1).
 
 ---
 
