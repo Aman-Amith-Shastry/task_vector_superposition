@@ -1,12 +1,12 @@
 # Empirical Verification of Linear Task Superposition in LLMs
 
-An empirical study of whether In-Context Learning (ICL) examples induce **linearly superposed task representations** in transformer residual streams, whether that linearity is quantifiable and statistically significant, and whether it is **causally functional**.
+An empirical study of whether In-Context Learning (ICL) examples induce **linearly superposed task representations** in transformer residual streams, whether that linearity is quantifiable and statistically significant, and **how uniformly it holds across network depth**.
 
-When in-context examples span multiple tasks, LLMs represent and perform all of them at once — *task superposition*. Prior work posits that this superposition is a **convex combination** of individual task vectors, but this had not been directly verified at the activation level in instruction-tuned models. We verify it three ways:
+When in-context examples span multiple tasks, LLMs represent and perform all of them at once — *task superposition*. Prior work posits that this superposition is a **convex combination** of individual task vectors, but this had not been directly verified at the activation level in instruction-tuned models, nor had its **uniformity across depth** been examined. We study it three ways:
 
-1. **Geometry (κ).** Mixed-task contrast-vector centroids land on the ratio-weighted convex combination of the pure-task centroids (κ ≈ 1), calibrated against an **exact permutation null** — significant at the floor *p* = 1/720 for every model, task group, and layer.
-2. **Recoverability (OLS).** The true mixture ratio of a mixed-task prompt is recoverable from the pure-task centroids via reparameterized OLS, with no prior knowledge of the task distribution.
-3. **Causality (injection).** Injecting the convex combination of pure-task vectors into a task-free prompt shifts model behavior toward the injected ratio's ICL distribution — significant at permutation *p* = 0.0001 in every condition, in two model families.
+1. **Geometry (κ).** Mixed-task contrast-vector centroids land on the ratio-weighted convex combination of the pure-task centroids (κ ≈ 1), calibrated against an **exact permutation null** — significant at the floor *p* = 1/720 for every model, task group, and layer. But κ is a *scalar* projection: scale-accurate, yet near-constant across depth, so it cannot reveal how the geometry changes layer to layer.
+2. **The orthogonal residual (central analysis).** κ is blind to the component *orthogonal* to the predicted convex direction. Calibrated against a **split-half sampling-noise floor**, this residual's *magnitude* grows with depth, while its *resolvability* above the floor peaks in the **middle layers** — locating where linear superposition is geometrically tight and where it begins to strain. Whether a resolvable orthogonal component emerges at all is governed by **task separability**, not depth alone, yielding three regimes: *residual-driven*, *floor-driven*, and *floor-limited*.
+3. **Recoverability (OLS).** The true mixture ratio of a mixed-task prompt is recoverable from the pure-task centroids via reparameterized OLS, with no prior knowledge of the task distribution — confirming the linear structure is precise enough to decode.
 
 Inspired by [*Everything Everywhere All at Once* (Xiong et al., 2024)](https://arxiv.org/abs/2410.05603), which established task superposition **behaviorally** in pretrained models. Behavioral superposition is a claim about *outputs* and does not by itself entail that the underlying representations **combine linearly**; we test the representations directly.
 
@@ -37,6 +37,11 @@ This removes the test question's independent contribution, leaving only the shif
 κ = 1 means perfect linear combination; κ = 0 means orthogonal (no linear tracking); κ is signed and unbounded by design, so it *could* be negative or ≫ 1. κ is undefined for the equal 1-1-1 ratio (predicted = center, denominator = 0) and excluded there. All κ is computed in the **original activation space**, not the LDA projection used for the scatter plots.
 
 **Exact permutation null.** κ ≈ 1 could in principle be an artifact of the metric's scale, so we calibrate it. For the *K* = 6 mixed ratios with a well-defined predicted displacement (the three pure ratios form the basis; 1-1-1 is excluded), we re-pair each observed displacement with a permuted prediction and score the mean κ. With 6! = 720 relabelings we enumerate the null **exactly**; the observed pairing beating all others gives the floor *p* = 1/720 ≈ 1.4 × 10⁻³. See [`experiments/kappa_null.py`](experiments/kappa_null.py).
+
+**Orthogonal residual + split-half noise floor.** κ pins only the component of the observed displacement *along* the predicted convex direction; it is blind to any *orthogonal* deviation. We measure that residual directly as the sine of the angle between the observed and predicted displacements, `sinθ(d, d̂)`. In finite samples this can never reach 0 (the centroid carries sampling noise), so comparing it to 0 is uninformative. Instead we calibrate it against a **split-half sampling-noise floor** φ: repeatedly split a ratio's samples in half, form a displacement from each half, and take the angle between them (holding the pure-task basis at its full-sample value, 500 splits). φ is the best agreement the data can resolve — no prediction should align with `d` more closely than an independent estimate of `d` aligns with itself.
+
+* The **magnitude** of the residual is reported with the full-sample `sinθ` (minimum-variance, so it tracks the trend across depth without being flattened by noise).
+* **Resolvability** is tested with a *size-matched* residual on the same *n*/2 half-samples as the floor, so the comparison is fair. The **resolvability ratio** `R = s̃/φ` has `R = 1` as the floor: `R > 1` marks a statistically resolvable orthogonal component; `R ≤ 1` means the mixed centroid is indistinguishable from the exact convex-predicted point given sampling noise. See [`experiments/aggregate_split_half.py`](experiments/aggregate_split_half.py) and [`experiments/bootstrap_ci.py`](experiments/bootstrap_ci.py).
 
 ---
 
@@ -78,6 +83,8 @@ Mean κ ± 1 std across mixed ratios at each relative depth; grey band = κ ∈ 
 
 Format-varying **Arithmetic** shows the largest κ-variance growth with depth; semantic **MMLU** holds κ ≈ 1 nearly flat. Qwen and Gemma replicate the Llama pattern despite different architectures, training data, and tokenizers — supporting cross-family generalizability.
 
+The **mean** κ, however, stays near unity at every depth in every cell. As a scalar projection it is scale-accurate but *flat across depth* — it establishes that linear superposition captures the dominant structure, but not how the geometry changes layer to layer. That question is carried entirely by the component κ ignores: the **orthogonal residual**, analyzed next.
+
 ### Layer-sweep projections (LDA, 8 relative depths)
 
 Large dots = pure-task centroids, small dots = samples, × = ratio-predicted centroid, dotted line = predicted→actual gap, κ annotated per mixed ratio.
@@ -102,7 +109,41 @@ Large dots = pure-task centroids, small dots = samples, × = ratio-predicted cen
 
 ---
 
-## Result 2 — Recoverability: inferring the mixture ratio via OLS
+## Result 2 — The orthogonal residual: where linearity strains, and why
+
+κ confirms the mixed centroid lies *along* the predicted convex direction, but a centroid can project with unit coefficient and still sit *off* the predicted point. We measure that orthogonal residual `sinθ(d, d̂)` directly and calibrate it against the split-half sampling-noise floor φ (see *Core methodology*). **This is the paper's central analysis.**
+
+**Two findings.**
+1. The residual's **magnitude** is smallest in the early layers (sinθ ≈ 0.30–0.49, at or below the floor) and substantially larger by the deepest layers (≈ 0.55–0.83) — linear superposition is geometrically **tightest early**.
+2. Whether the deeper residual is *statistically resolvable* above the floor is governed by **task separability, not depth alone**: for well-separated groups the pure-task displacements sharpen with depth, shrinking φ until the residual clears it; for entangled MMLU (three subjects sharing one A/B/C/D format) the floor stays high and the residual stays buried.
+
+This is about *resolving power*, not a breakdown of linearity — κ stays ≈ 1 in every case, and the convex combination remains the dominant, decodable structure at all depths.
+
+### Residual magnitude and resolvability vs. depth
+
+Left: full-sample residual magnitude (solid) vs. its split-half floor (dashed), per model. Right: resolvability ratio `R = s̃/φ` aggregated across models per group; dashed line = floor (R = 1), above which the orthogonal component is resolvable.
+
+| Residual magnitude (+ noise floor) | Resolvability `R = s̃/φ` |
+|---|---|
+| ![orthogonal residual vs depth](results/orthogonal_residual_depth.png) | ![resolvability ratio vs depth](results/orthogonal_residual_ratio_depth_by_model.png) |
+
+The residual's magnitude grows with depth **everywhere**, but its resolvability does **not**: it peaks in the **middle layers** for the well-separated groups and decays back toward the floor by the deepest layers, while MMLU stays at or below the floor throughout.
+
+### One mechanism, three regimes
+
+Resolvability `R = s̃/φ` has **two levers**: it rises when the orthogonal residual *grows* (numerator up) and when task separability *sharpens*, shrinking the floor (denominator down). Decomposing the ascending run of `R` up to its peak — per-model least-squares slopes of the residual and the floor vs. relative depth, averaged across the five models:
+
+| Group | Mean peak depth | Residual ROC | Floor ROC | Regime |
+|---|---|---|---|---|
+| **Arithmetic** | 0.38 | **+1.0** | 0.0 | **Residual-driven** — an emerging orthogonal component rises into a near-static floor |
+| **Entity** | 0.56 | +0.2 | **−1.3** | **Floor-driven** — a collapsing floor exposes an almost-flat residual as separation sharpens |
+| **MMLU** | 0.73 | +0.5 | +0.2 | **Floor-limited** — residual grows as elsewhere, but the floor never falls, so it stays buried |
+
+(ROC = rate of change per unit relative depth.) A resolvable orthogonal component thus emerges only where a **rising residual meets a falling floor** — a mid-depth phenomenon for separable geometries, and one that never surfaces for entangled ones, even though all three groups preserve their first-order linear structure equally well (κ ≈ 1).
+
+---
+
+## Result 3 — Recoverability: inferring the mixture ratio via OLS
 
 If task vectors superpose linearly, the map ICL ratio → contrast vector is invertible: given a contrast vector from an unknown prompt, recover the mixing coefficients α. For a probe `x` and pure-task centroids `c₁, c₂, c₃`, solve
 
@@ -130,33 +171,6 @@ Recovery is strong across all groups; MMLU is the most accurate and uniform, whi
 
 ---
 
-## Result 3 — Causality: injecting the convex combination steers behavior
-
-Geometry alone is correlational. We test whether the convex combination is **causally sufficient**: reconstruct `v_inj(r) = Σ wₖ·ĉₖ` from pure-task vectors, add `α·v_inj(r)` to the residual stream of an otherwise task-free prompt, and measure whether the first-token distribution shifts toward the ratio-*r* ICL distribution (Jensen–Shannon confusion matrix, **double-centered** to remove row/column main effects; a genuine match is a *negative* diagonal). Significance is an exact-logic permutation test over ratio relabelings (10,000 draws, add-one corrected). The injection layer and α are fixed on the **pure ratios only** — never on the mixed-ratio outcomes under test.
-
-**Injection results (mean double-centered JS diagonal, 95% CI; more negative = stronger task-matching):**
-
-| Group | Format | Llama-3.2-3B (*l*=18) | perm-*p* | Qwen-2.5-3B (*l*=27) | perm-*p* |
-|---|---|---|---|---|---|
-| Entity | — | −0.0232 [−0.0300, −0.0170] | 0.0001 | −0.0012 [−0.0014, −0.0009] | 0.0001 |
-| Arithmetic | Direct | −0.0251 [−0.0283, −0.0224] | 0.0001 | −0.0196 [−0.0247, −0.0146] | 0.0001 |
-| Arithmetic | MCQ | −0.0449 [−0.0467, −0.0431] | 0.0001 | −0.0170 [−0.0243, −0.0102] | 0.0001 |
-| Arithmetic | Verification | −0.0753 [−0.0783, −0.0724] | 0.0001 | −0.0091 [−0.0107, −0.0079] | 0.0001 |
-
-Every condition is significant at *p* = 0.0001 in **both** model families. Qwen's magnitudes are smaller because its first-token distributions occupy a more compressed JS range, so each model is compared against its own null, not across models by raw magnitude. α = 4 throughout, except Qwen Direct (α = 6). Increasing α past its optimum *degrades* task-matching — a signature of genuine steering rather than a monotone artifact.
-
-**Injection depth ≠ OLS decomposition layer.** OLS recovery is most accurate at a *shallow* layer (arithmetic *l*=3), but injecting there is causally inert — the geometry is readable early but not yet wired into the output computation:
-
-| Format | Injection at OLS layer *l*=3 | *p* |
-|---|---|---|
-| Direct | −0.0030 [−0.0036, −0.0023] | 0.0001 |
-| MCQ | +0.0008 [+0.0006, +0.0010] | 1.0000 |
-| Verification | +0.0003 [+0.0002, +0.0004] | 1.0000 |
-
-At *l*=3 the effect is an order of magnitude smaller (Direct) or non-significant (MCQ, Verification); at *l*=18 every format is decisively significant (table above). **OLS recovery accuracy does not necessarily correlate with injection efficacy** — the two criteria probe different (static-geometric vs. causal) properties.
-
----
-
 ## Project structure
 
 ```
@@ -168,20 +182,21 @@ At *l*=3 the effect is an order of magnitude smaller (Direct) or non-significant
 │   ├── data_entity_attribute.py        # Capital / Currency / Language (country-attribute) pools
 │   └── data_semantic_domains.py        # History / Law / ML MMLU pools
 ├── experiments/
-│   ├── sweep_arithmetic.py             # ratio + layer sweep, arithmetic (κ + permutation null)
+│   ├── sweep_arithmetic.py             # ratio + layer sweep, arithmetic (κ + split-half + permutation null)
 │   ├── sweep_entity.py                 # ratio + layer sweep, entity attribution
 │   ├── sweep_mmlu.py                   # ratio + layer sweep, MMLU semantic domains
 │   ├── kappa_null.py                   # exact 720-permutation null for κ
 │   ├── plot_kappa_comparison.py        # cross-model κ comparison plots
+│   ├── aggregate_split_half.py         # orthogonal residual + split-half noise floor (magnitude, resolvability)
+│   ├── bootstrap_ci.py                 # bootstrap CIs for the resolvability ratio R
+│   ├── plot_residual_depth.py          # residual magnitude vs. depth (+ floor), per group
+│   ├── plot_residual_ratio_depth.py    # resolvability R = s̃/φ vs. depth, aggregated across models
 │   └── task_vector_injection/
 │       ├── extract_arithmetic.py           # pure-task contrast-vector extraction, arithmetic
 │       ├── extract_entity.py               # pure-task contrast-vector extraction, entity
 │       ├── extract_vectors.py              # pure-task contrast-vector extraction, MMLU
-│       ├── decompose_task_mixture.py       # inverse superposition (reparameterized OLS)
-│       ├── inject_arithmetic_js.py         # causal injection + JS confusion test, arithmetic
-│       ├── inject_entity_js.py             # causal injection + JS confusion test, entity
-│       └── inject_entity_behavioral.py     # behavioral (answer-distribution) injection check
-├── results/                            # output figures + κ JSON (κ values, permutation null)
+│       └── decompose_task_mixture.py       # inverse superposition / mixture recovery (reparameterized OLS)
+├── results/                            # output figures + κ JSON (κ, split-half residual/floor, permutation null)
 ├── ratio_centroids/                    # cached mixed-ratio centroids (for downstream metrics)
 └── archive/                            # earlier exploratory experiments
 ```
@@ -203,14 +218,16 @@ python experiments/plot_kappa_comparison.py                          # → arith
 python experiments/plot_kappa_comparison.py --glob "entity_kappa_*.json"
 python experiments/plot_kappa_comparison.py --glob "mmlu_kappa_*.json"
 
+# --- orthogonal residual + split-half noise floor (reads results/*_kappa_*.json) ---
+python experiments/aggregate_split_half.py --grid                    # residual/floor summary table (per layer)
+python experiments/bootstrap_ci.py                                   # bootstrap CIs for resolvability R = s̃/φ
+python experiments/plot_residual_depth.py                            # → results/orthogonal_residual_depth.png
+python experiments/plot_residual_ratio_depth.py --per-model          # → results/orthogonal_residual_ratio_depth_by_model.png
+
 # --- OLS mixture recovery ---
 python experiments/task_vector_injection/decompose_task_mixture.py --select_layer          # find best layer on pure ratios
 python experiments/task_vector_injection/decompose_task_mixture.py --layer 3 --sweep --ci   # all 10 ratios + bootstrap CIs
 python experiments/task_vector_injection/decompose_task_mixture.py --experiment mmlu --layer 18 --sweep --noise
-
-# --- causal injection (JS confusion + double-centered permutation test) ---
-python experiments/task_vector_injection/inject_arithmetic_js.py --layers 18 --alphas 4 --all_ratios
-python experiments/task_vector_injection/inject_entity_js.py     --layer 18 --alphas 4 --all_ratios
 ```
 
 Set the model with `--model` or the `TASK_VECTOR_MODEL` environment variable. Outputs (PNG figures and κ JSON) are written to `results/`.
@@ -219,4 +236,4 @@ Set the model with `--model` or the `TASK_VECTOR_MODEL` environment variable. Ou
 
 ## Background
 
-Early exploratory work (archived) tested the same superposition hypothesis on medical-specialty tasks (Medicine / Surgery / Pharmacology from MedMCQA) and format-distinct clinical tasks (MCQ / PubMedQA / Symptom2Disease). Those runs established the initial observation of linear superposition and that optimal layer depth differs by task type (early for format, middle for semantics). The arithmetic, entity, and MMLU experiments here add tighter controls, the quantitative κ framework with an exact null, and the causal injection test.
+Early exploratory work (archived) tested the same superposition hypothesis on medical-specialty tasks (Medicine / Surgery / Pharmacology from MedMCQA) and format-distinct clinical tasks (MCQ / PubMedQA / Symptom2Disease). Those runs established the initial observation of linear superposition and that optimal layer depth differs by task type (early for format, middle for semantics). The arithmetic, entity, and MMLU experiments here add tighter controls, the quantitative κ framework with an exact null, the depth-resolved orthogonal-residual analysis against a split-half noise floor, and OLS mixture recovery.

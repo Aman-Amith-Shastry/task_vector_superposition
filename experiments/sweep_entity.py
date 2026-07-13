@@ -34,7 +34,7 @@ _mp.add_argument("--model", default="meta-llama/Llama-3.2-3B-Instruct",
                  help="HuggingFace model ID to use.")
 _mp.add_argument("--quantize", default="", choices=["", "int8", "int4"],
                  help="Quantize weights via quanto (recommended for 8B on MPS).")
-_mp.add_argument("--null-check", action="store_true",
+_mp.add_argument("--null-check", "--null_check", action="store_true",
                  help="Also compute the exact 720-permutation null for κ (per layer).")
 _margs, _ = _mp.parse_known_args()
 os.environ["TASK_VECTOR_MODEL"]    = _margs.model
@@ -59,7 +59,7 @@ import matplotlib.pyplot as plt
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 from local_model import get_activations_all_layers, n_layers
-from kappa_null import kappa_permutation_null
+from kappa_null import kappa_permutation_null, split_half_consistency
 from data_entity_attribute import (
     TASKS, RATIOS, PURE_RATIOS, N_VECTOR_SAMPLES, load_pools, build_messages,
     format_test_input,
@@ -153,6 +153,8 @@ def plot_layer_grid(results: dict, layers: list[int]) -> None:
     kappa_data: dict[str, list[float]] = {}
     # kappa_null_data[layer] = exact permutation-null summary (only if NULL_CHECK)
     kappa_null_data: dict[str, dict] = {}
+    # split_half_data[layer] = split-half noise-floor calibration (only if NULL_CHECK)
+    split_half_data: dict[str, dict] = {}
     # ratio_centroids_out["{layer}|{ratio}"] = original-space actual centroid μ_r^l
     # for all 10 ratios; persisted (see below) so ρ / κ / cosine can be recomputed
     # offline without re-running the model.
@@ -263,6 +265,16 @@ def plot_layer_grid(results: dict, layers: list[int]) -> None:
                   f"exact perm-p = {null['p_value']:.4g}  "
                   f"(null mean {null['null_mean']:.3f}, n_perm {null['n_perm']})")
 
+            sh = split_half_consistency(
+                {r: results[r][layer] for r in RATIOS}, PURE_RATIOS
+            )
+            if sh is not None:
+                split_half_data[str(layer)] = sh
+                print(f"    layer {layer}: sin_pred {sh['sin_pred_mean']:.3f} "
+                      f"(matched {sh['sin_pred_half_mean']:.3f}) vs noise floor "
+                      f"{sh['sin_floor_mean']:.3f}  within_floor={sh['within_floor']} "
+                      f"(best-case {sh['within_floor_full']})")
+
         ax.set_title(f"Layer {layer}", fontsize=10)
         ax.set_xlabel("LDA 1", fontsize=8)
         ax.set_ylabel("LDA 2", fontsize=8)
@@ -306,17 +318,32 @@ def plot_layer_grid(results: dict, layers: list[int]) -> None:
             "n_layers":   n_layers,
             "kappa":      kappa_data,        # {layer_str: [kappa, ...]}
             "kappa_null": kappa_null_data,   # {layer_str: {S_obs, p_value, ...}}
+            "split_half": split_half_data,   # {layer_str: {sin_pred_mean, sin_floor_mean, ...}}
         }, f, indent=2)
     print(f"Saved κ data → {json_out}")
 
-    # Persist the actual per-ratio centroids so ρ / κ / cosine can be recomputed
-    # offline without re-running the model. Kept out of vectors/ (which holds the
-    # pure-task injection vectors); ratio_centroids/ holds all 10 ratios per layer.
+    # Persist the per-ratio centroids (means) so κ / cosine can be recomputed
+    # offline without re-running the model. ratio_centroids/ holds all 10 ratios
+    # per layer.
     _rc_dir = os.path.join(_root, "ratio_centroids")
     os.makedirs(_rc_dir, exist_ok=True)
     _rc_out = os.path.join(_rc_dir, f"entity_{MODEL_TAG}.npz")
     np.savez(_rc_out, **ratio_centroids_out)
     print(f"Saved ratio centroids → {_rc_out}")
+
+    # Persist the FULL per-sample contrast vectors (not just the centroids) so the
+    # split-half floor and bootstrap CIs can be recomputed offline without re-running
+    # the model. Each entry is the (n_samples, hidden) array for one "{layer}|{ratio}";
+    # savez_compressed keeps the on-disk size manageable.
+    _rs_dir = os.path.join(_root, "ratio_samples")
+    os.makedirs(_rs_dir, exist_ok=True)
+    ratio_samples_out = {
+        f"{l}|{'-'.join(map(str, r))}": results[r][l].astype(np.float32)
+        for r in RATIOS for l in layers
+    }
+    _rs_out = os.path.join(_rs_dir, f"entity_{MODEL_TAG}.npz")
+    np.savez_compressed(_rs_out, **ratio_samples_out)
+    print(f"Saved ratio samples → {_rs_out}")
 
 
 # --------------------------------------------------------------------------
