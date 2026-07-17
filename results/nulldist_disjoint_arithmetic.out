@@ -1,0 +1,29 @@
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/254 [00:00<?, ?it/s]Loading weights:   0%|          | 1/254 [00:02<10:55,  2.59s/it]Loading weights:  22%|██▏       | 57/254 [00:02<00:07, 27.30it/s]Loading weights:  28%|██▊       | 70/254 [00:03<00:05, 32.32it/s]Loading weights:  32%|███▏      | 81/254 [00:03<00:04, 36.63it/s]Loading weights:  35%|███▌      | 90/254 [00:03<00:04, 37.60it/s]Loading weights:  39%|███▊      | 98/254 [00:03<00:04, 38.46it/s]Loading weights:  41%|████▏     | 105/254 [00:03<00:04, 37.14it/s]Loading weights:  44%|████▎     | 111/254 [00:03<00:03, 36.43it/s]Loading weights:  47%|████▋     | 120/254 [00:04<00:03, 37.36it/s]Loading weights:  51%|█████     | 129/254 [00:04<00:03, 39.37it/s]Loading weights:  54%|█████▍    | 138/254 [00:04<00:02, 39.54it/s]Loading weights:  58%|█████▊    | 147/254 [00:04<00:02, 41.19it/s]Loading weights:  61%|██████▏   | 156/254 [00:04<00:02, 47.11it/s]Loading weights:  68%|██████▊   | 172/254 [00:05<00:01, 67.68it/s]Loading weights:  72%|███████▏  | 183/254 [00:05<00:01, 65.15it/s]Loading weights:  76%|███████▌  | 192/254 [00:05<00:01, 61.60it/s]Loading weights:  79%|███████▉  | 201/254 [00:05<00:00, 57.58it/s]Loading weights:  83%|████████▎ | 210/254 [00:05<00:00, 53.40it/s]Loading weights:  86%|████████▌ | 219/254 [00:05<00:00, 52.44it/s]Loading weights:  90%|████████▉ | 228/254 [00:06<00:00, 51.73it/s]Loading weights:  93%|█████████▎| 237/254 [00:06<00:00, 50.55it/s]Loading weights:  97%|█████████▋| 246/254 [00:06<00:00, 50.34it/s]Loading weights: 100%|██████████| 254/254 [00:06<00:00, 38.80it/s]
+Model device: mps:0
+[transformers] Passing `generation_config` together with generation-related arguments=({'max_new_tokens', 'temperature', 'do_sample'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.
+Model: meta-llama/Llama-3.2-3B-Instruct  (Llama-3B, 28 layers)
+Group: arithmetic   Layers: [1, 3, 6, 8, 11, 14, 18, 21]
+Mixed ratios: ['2-1-0', '1-2-0', '0-2-1', '0-1-2', '2-0-1', '1-0-2']
+Questions (inner): 10   Draws (null size): 30
+Centroids fit on 40 held-out questions (evaluating on questions 0..9, disjoint)
+Loading pools...
+  captured question 1/10
+  captured question 2/10
+  captured question 3/10
+  captured question 4/10
+  captured question 5/10
+  captured question 6/10
+  captured question 7/10
+  captured question 8/10
+  captured question 9/10
+  captured question 10/10
+  evaluated ratio 2-1-0 in 483s  (deepest: KL_test=0.034, pctile in 30-draw null = 100%, KL_zs=3.764)   [~2415s left]
+  evaluated ratio 1-2-0 in 592s  (deepest: KL_test=0.057, pctile in 30-draw null = 100%, KL_zs=3.594)   [~2366s left]
+  evaluated ratio 0-2-1 in 689s  (deepest: KL_test=0.015, pctile in 30-draw null = 100%, KL_zs=3.671)   [~2068s left]
+  evaluated ratio 0-1-2 in 621s  (deepest: KL_test=0.118, pctile in 30-draw null = 100%, KL_zs=4.280)   [~1241s left]
+  evaluated ratio 2-0-1 in 473s  (deepest: KL_test=0.016, pctile in 30-draw null = 100%, KL_zs=2.464)   [~473s left]
+  evaluated ratio 1-0-2 in 516s  (deepest: KL_test=0.026, pctile in 30-draw null = 100%, KL_zs=3.241)   [~0s left]
+
+null |cos(g,residual)| mean = 0.015 (≈0 confirms random orthogonal directions)
+stored -> causal_projection/nulldist_arithmetic_Llama-3B.npz, causal_projection/nulldist_arithmetic_Llama-3B.json

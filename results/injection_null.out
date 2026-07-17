@@ -1,0 +1,8 @@
+Last tested layer-
+  evaluated ratio 2-1-0 in 493s  (deepest: KL_test=0.037, pctile in 30-draw null = 100%)   [~2463s left]
+  evaluated ratio 1-2-0 in 587s  (deepest: KL_test=0.051, pctile in 30-draw null = 100%)   [~2349s left]
+  evaluated ratio 0-2-1 in 600s  (deepest: KL_test=0.016, pctile in 30-draw null = 100%)   [~1801s left]
+  evaluated ratio 0-1-2 in 541s  (deepest: KL_test=0.101, pctile in 30-draw null = 100%)   [~1083s left]
+  evaluated ratio 2-0-1 in 441s  (deepest: KL_test=0.016, pctile in 30-draw null = 100%)   [~441s left]
+  evaluated ratio 1-0-2 in 465s  (deepest: KL_test=0.021, pctile in 30-draw null = 100%)   [~0s left]
+

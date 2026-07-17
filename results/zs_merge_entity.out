@@ -1,0 +1,38 @@
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/254 [00:00<?, ?it/s]Loading weights:   0%|          | 1/254 [00:04<17:19,  4.11s/it]Loading weights:  19%|█▉        | 48/254 [00:04<00:13, 15.43it/s]Loading weights:  24%|██▍       | 61/254 [00:04<00:10, 18.27it/s]Loading weights:  28%|██▊       | 70/254 [00:04<00:09, 20.30it/s]Loading weights:  30%|███       | 77/254 [00:05<00:08, 21.94it/s]Loading weights:  33%|███▎      | 84/254 [00:05<00:07, 24.05it/s]Loading weights:  37%|███▋      | 93/254 [00:05<00:06, 26.66it/s]Loading weights:  40%|████      | 102/254 [00:05<00:05, 29.38it/s]Loading weights:  44%|████▎     | 111/254 [00:06<00:04, 31.51it/s]Loading weights:  47%|████▋     | 120/254 [00:06<00:03, 35.09it/s]Loading weights:  51%|█████     | 129/254 [00:06<00:03, 38.00it/s]Loading weights:  54%|█████▍    | 138/254 [00:06<00:02, 38.76it/s]Loading weights:  58%|█████▊    | 147/254 [00:06<00:02, 36.89it/s]Loading weights:  61%|██████▏   | 156/254 [00:07<00:02, 37.80it/s]Loading weights:  65%|██████▍   | 165/254 [00:07<00:02, 35.74it/s]Loading weights:  69%|██████▊   | 174/254 [00:07<00:01, 42.90it/s]Loading weights:  72%|███████▏  | 183/254 [00:07<00:01, 49.77it/s]Loading weights:  76%|███████▌  | 192/254 [00:07<00:01, 54.65it/s]Loading weights:  79%|███████▉  | 201/254 [00:08<00:01, 48.65it/s]Loading weights:  83%|████████▎ | 210/254 [00:08<00:00, 46.28it/s]Loading weights:  86%|████████▌ | 219/254 [00:08<00:00, 46.42it/s]Loading weights:  90%|████████▉ | 228/254 [00:08<00:00, 47.27it/s]Loading weights:  93%|█████████▎| 237/254 [00:08<00:00, 45.20it/s]Loading weights:  97%|█████████▋| 246/254 [00:09<00:00, 45.06it/s]Loading weights: 100%|██████████| 254/254 [00:09<00:00, 28.02it/s]
+[transformers] Passing `generation_config` together with generation-related arguments=({'do_sample', 'max_new_tokens', 'temperature'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.
+Model device: mps:0
+Model: meta-llama/Llama-3.2-3B-Instruct  (Llama-3B, 28 layers)
+Group: entity   Layers: [1, 3, 6, 8, 11, 14, 18, 21]
+Mixed ratios: ['2-1-0', '1-2-0', '0-2-1', '0-1-2', '2-0-1', '1-0-2']
+Questions (inner): 10   Draws (null size): 100
+--zs-only: merging into nulldist_entity_Llama-3B.npz (reusing its 30-draw null and test arms)
+Loading pools...
+  captured question 1/10
+  captured question 2/10
+  captured question 3/10
+  captured question 4/10
+  captured question 5/10
+  captured question 6/10
+  captured question 7/10
+  captured question 8/10
+  captured question 9/10
+  captured question 10/10
+  evaluated ratio 2-1-0 in 14s  (deepest: KL_zs=9.517)   [~70s left]
+  evaluated ratio 1-2-0 in 14s  (deepest: KL_zs=11.704)   [~56s left]
+  evaluated ratio 0-2-1 in 14s  (deepest: KL_zs=12.888)   [~42s left]
+  evaluated ratio 0-1-2 in 14s  (deepest: KL_zs=7.239)   [~28s left]
+  evaluated ratio 2-0-1 in 15s  (deepest: KL_zs=9.436)   [~15s left]
+  evaluated ratio 1-0-2 in 15s  (deepest: KL_zs=5.505)   [~0s left]
+
+merged zs arm -> causal_projection/nulldist_entity_Llama-3B.npz
+pooled over ratios, per layer:
+ depth layer     KL_zs
+  0.04     1     0.005
+  0.11     3     0.033
+  0.21     6     0.114
+  0.29     8     1.033
+  0.39    11     6.889
+  0.50    14     8.320
+  0.64    18     8.550
+  0.75    21     9.382

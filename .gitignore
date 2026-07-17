@@ -12,3 +12,6 @@ wheels/
 
 # Virtual environments
 env/
+
+# Large local artifacts (some >GitHub's 100MB limit)
+causal_projection/
