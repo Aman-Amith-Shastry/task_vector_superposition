@@ -80,7 +80,7 @@ def _draw_group(ax, group, clip, first):
     """Plot one task group's cross-model kappa-vs-depth panel. Returns
     {tag: Line2D} handles from the first panel (for a shared legend)."""
     ax.axhline(1.0, color="gray", lw=1.4, ls="--", alpha=0.7,
-               label="$\\kappa = 1$ (perfect linearity)" if first else None)
+               label="$\\kappa = 1$ (exact superposition)" if first else None)
     ax.axhspan(0.75, 1.25, color="gray", alpha=0.07,
                label="$\\kappa \\in [0.75, 1.25]$" if first else None)
 
