@@ -154,13 +154,13 @@ Statistical resolvability tells us whether the residual is distinguishable from 
 **Findings, at three-quarter depth (layer 21 of Llama-3.2-3B):**
 * The relative residual magnitude ρ (which is ≈ 0.003–0.012 at the shallowest probed layer) grows to **0.162 (Arithmetic), 0.242 (Entity), 0.067 (MMLU)**, while κ stays within [0.85, 1.09] throughout — the dominant linear structure is preserved even as the orthogonal component grows.
 * **The true ablation beats all 30 null draws in all 6 mixed ratios in all 3 task groups** (smallest one-sided *p* = 1/31 ≈ 0.032 per ratio).
-* Pooled KL divergence far exceeds the null mean: **Arithmetic 0.044 nats vs. 0.005 (8.0× the largest null draw), Entity 0.297 vs. 0.042 (4.7×), MMLU 0.0036 vs. 0.0004 (6.5×)**.
-* **Negative control:** at the shallowest probed layer, the ablation's percentile within the null distribution scatters from the 3rd to the 87th percentile across ratios — indistinguishable from random — confirming the deep-layer effect is a genuine depth-dependent phenomenon, not a patching artifact.
-* **MMLU dissociation:** MMLU has the smallest ρ and the κ closest to 1, and its residual sits at or below the split-half noise floor (statistically *unresolvable*, per Result 2) — yet its ablation still clears the null in all 6 ratios by 6.5×. Magnitude, statistical resolvability, and causal importance are three separate properties: a direction can be too small to distinguish from sampling noise and still be the direction the model's output actually depends on.
+* Pooled KL divergence far exceeds the null mean: **Arithmetic 0.044 nats vs. 0.005 (8.0× the largest null draw), Entity 0.297 vs. 0.042 (4.7×), MMLU 0.0039 vs. 0.0004 (6.2×)**.
+* **Negative control:** at the shallowest probed layer, the ablation's percentile within the null distribution scatters from the 0th to the 87th percentile across ratios — indistinguishable from random — confirming the deep-layer effect is a genuine depth-dependent phenomenon, not a patching artifact.
+* **MMLU dissociation:** MMLU has the smallest ρ and the κ closest to 1, and its residual sits at or below the split-half noise floor (statistically *unresolvable*, per Result 2) — yet its ablation still clears the null in all 6 ratios by 6.2×. Magnitude, statistical resolvability, and causal importance are three separate properties: a direction can be too small to distinguish from sampling noise and still be the direction the model's output actually depends on.
 
 ### Ablation vs. null, across depth
 
-Solid = true ablation KL, dashed = null mean, shaded band = full range of the 30 null draws, filled/hollow markers indicate significance; log scale. MMLU is evaluated only at layer 21 due to compute cost.
+Solid = true ablation KL, dashed = null mean, shaded band = full range of the 30 null draws, filled/hollow markers indicate significance; log scale.
 
 ![residual ablation vs null, by depth](results/residual_ablation_centroid_Llama-3B.png)
 

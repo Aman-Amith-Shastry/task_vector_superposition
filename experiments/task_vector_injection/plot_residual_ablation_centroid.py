@@ -26,7 +26,6 @@ GROUPS = [("arithmetic", "Arithmetic", "#0072B2", "o"),
           ("entity",     "Entity",     "#D55E00", "s"),
           ("mmlu",       "MMLU",       "#009E73", "^")]
 NULL_GROUPS = ["arithmetic", "entity", "mmlu"]   # groups with a causal null run
-# MMLU's null was run at layer 21 only, so it plots as a single point, not a curve.
 
 
 def main():
@@ -55,7 +54,7 @@ def main():
         allcell = [(null[:, k, :] < test[:, k, None]).all() for k in range(len(depth))]
 
         if len(depth) == 1:
-            # Single swept layer (MMLU): a band/curve is undefined, so draw the null's
+            # Single swept layer (e.g. a --layers 21 run): a band/curve is undefined, so draw the null's
             # full support as a vertical range at that depth and the ablation as a point.
             d0 = depth[0]
             ax2.vlines(d0, lo[0], hi[0], color=color, lw=6, alpha=0.20,
